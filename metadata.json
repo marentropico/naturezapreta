@@ -1,0 +1,6 @@
+{
+  "name": "Pitch Deck - Racismo Ambiental & ESG",
+  "description": "Landing Page interativa em formato de Pitch Deck voltada aos executivos da ArcelorMittal para captação de investimento e parceria estratégica em soluções contra o Racismo Ambiental.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
