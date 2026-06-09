@@ -1,4 +1,4 @@
-document.getElementById('Id_botao').addEventListener('submit', async function (event) {
+document.getElementById('Id-do-form').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const email = document.getElementById('email').value;
