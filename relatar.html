@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Relato de Ocorrência Socioambiental | EcoVoz</title>
+  
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
+
+  <main class="pt-compensate">
+    <div class="container-limite" style="max-width: 800px;">
+      
+      <!-- Cabeçalho de Introdução da Ouvidoria -->
+      <section class="text-center" style="margin-bottom: 40px;">
+        <span class="badge-esg">Canal Direto da Comunidade</span>
+        <h2 style="font-size: 32px; font-weight: 900; color: var(--green-dark); margin-top: 8px;">
+          Registrar Relato de Ocorrência
+        </h2>
+        <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 6px; max-width: 580px; margin-left: auto; margin-right: auto;">
+          Identificou poeira de carvão, ruído industrial noturno, contaminação de rios ou descarte irregular? registre sua queixa. Seu relato ajudará a comissão ESG.
+        </p>
+      </section>
+
+      <!-- CARD CENTRALIZADO DO FORMULÁRIO -->
+      <section class="metodologia-secao animate-scale-up" style="background-color: #FFFFFF; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-md); text-align: left; position: relative;">
+        
+        <!-- Tela de Sucesso (Inicialmente oculta) -->
+        <div id="success-window" class="success-box" style="display: none;">
+          <span>✔️</span>
+          <h4>Relato enviado com sucesso!</h4>
+          <p>
+            Sua queixa foi registrada de forma segura. Ela já está plotada no <strong>Mapa de Ocorrências</strong> e contabilizada nos gráficos de governança da aba <strong>Painel ESG</strong>.
+          </p>
+          <button type="button" id="btn-success-reset" class="btn-submit-form" style="max-width: 240px; margin: 20px auto 0;">
+            Registrar outro relato
+          </button>
+        </div>
+
+        <!-- Formulário Principal -->
+        <form id="form-relato-esg" class="modal-form">
+          
+          <!-- Banner LGPD informativo -->
+          <div class="proposta-valor-card" style="margin-top: 0; background-color: var(--bg-primary); padding: 16px;">
+            <div style="font-size: 18px;">🛡️</div>
+            <div>
+              <h4 style="color: var(--green-dark); font-weight: 850;">Garantia de Confidencialidade</h4>
+              <p style="font-size: 11px;">
+                Você decide se prefere se identificar ou relatar sob **anonimato total**. Nenhuma credencial pessoal é compartilhada publicamente com stakeholders industriais.
+              </p>
+            </div>
+          </div>
+
+          <!-- Caixa de mensagem de erro -->
+          <div id="error-box-relato" class="error-box" style="display: none;"></div>
+
+          <!-- Seletor de Tipo de Identidade -->
+          <div class="form-group">
+            <label>Tipo de Identificação</label>
+            <div class="btn-group-contrast" id="identity-btn-group">
+              <button type="button" id="btn-identity-anon" class="btn-contrast active">🛡️ Relato Anônimo</button>
+              <button type="button" id="btn-identity-ident" class="btn-contrast">👤 Identificar-me</button>
+            </div>
+          </div>
+
+          <!-- Campo condicional de Nome (Inicialmente oculto) -->
+          <div class="form-group animate-fade-in" id="group-relato-nome" style="display: none;">
+            <label for="relato-nome">Seu Nome Completo *</label>
+            <input type="text" id="relato-nome" placeholder="Ex: João da Silva Santos">
+          </div>
+
+          <!-- PAINEL CEP INTELIGENTE E GEOLOCALIZADO -->
+          <div class="sobre-pilares-card" style="padding: 24px; border-radius: var(--radius-md); background-color: #F8FAF7;">
+            <span class="modal-eyebrow" style="color: var(--green-medium);">Busca de Endereço Inteligente</span>
+            
+            <div class="sim-flow-row" style="margin-top: 14px; grid-template-cols: 5fr 7fr; gap: 16px;">
+              <!-- Input CEP -->
+              <div class="form-group">
+                <label for="relato-cep">CEP do Incidente *</label>
+                <div class="password-input-wrapper">
+                  <input type="text" id="relato-cep" maxlength="9" placeholder="Ex: 23525-060">
+                  <span id="cep-loader" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: none; font-size: 12px;">⏳</span>
+                </div>
+                <span id="cep-feedback-status" style="font-size: 10px; font-weight: 700; display: block; margin-top: 2px;"></span>
+              </div>
+
+              <!-- Atalhos de bairros pré-definidos -->
+              <div class="form-group">
+                <label>Preenchimento Rápido</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+                  <button type="button" class="btn-tab-dores inactive" style="padding: 6px 10px; font-size: 10px;" data-cep="23525-060" data-bairro="Jesuítas (Santa Cruz)" data-cidade="Rio de Janeiro" data-uf="RJ">Jesuítas (RJ)</button>
+                  <button type="button" class="btn-tab-dores inactive" style="padding: 6px 10px; font-size: 10px;" data-cep="11500-000" data-bairro="Vila Parisi" data-cidade="Cubatão" data-uf="SP">Vila Parisi (SP)</button>
+                  <button type="button" class="btn-tab-dores inactive" style="padding: 6px 10px; font-size: 10px;" data-cep="11403-100" data-bairro="Santa Cruz dos Navegantes" data-cidade="Guarujá" data-uf="SP">Navegantes (SP)</button>
+                  <button type="button" class="btn-tab-dores inactive" style="padding: 6px 10px; font-size: 10px;" data-cep="35160-025" data-bairro="Veneza" data-cidade="Ipatinga" data-uf="MG">Veneza (MG)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detalhes preenchidos do endereço (bairro, cidade, uf) -->
+            <div class="sim-bottom-row" style="margin-top: 16px; grid-template-cols: 5fr 5fr 2fr; gap: 12px; border-top: none; padding-top: 0;">
+              <div class="form-group">
+                <label for="relato-bairro">Bairro / Perímetro *</label>
+                <input type="text" id="relato-bairro" required placeholder="Ex: Jesuítas">
+              </div>
+              <div class="form-group">
+                <label for="relato-cidade">Cidade *</label>
+                <input type="text" id="relato-cidade" required placeholder="Ex: Rio de Janeiro">
+              </div>
+              <div class="form-group">
+                <label for="relato-uf">UF *</label>
+                <input type="text" id="relato-uf" required maxlength="2" placeholder="Ex: RJ" style="text-transform: uppercase;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Categoria do Incidente -->
+          <div class="form-group">
+            <label for="relato-categoria">Categoria Geral do Problema *</label>
+            <select id="relato-categoria" required>
+              <option value="Ar">Poluição do Ar / Fumaça siderúrgica</option>
+              <option value="Água">Qualidade da Água / Efluentes</option>
+              <option value="Ruído">Conforto Acústico / Sons industriais</option>
+              <option value="Resíduos">Resíduos Sólidos / Lixo siderúrgico</option>
+              <option value="Mobilidade">Mobilidade urbana / Frotas de carretas</option>
+              <option value="Verde urbano">Verde Urbano / Ilha de calor</option>
+            </select>
+          </div>
+
+          <!-- Resumo da Ocorrência & Frequência -->
+          <div class="sim-flow-row" style="grid-template-cols: 8fr 4fr; gap: 16px;">
+            <div class="form-group">
+              <label for="relato-problema">Resumo do Problema *</label>
+              <input type="text" id="relato-problema" required placeholder="Ex: Fuligem e poeira de ferro de usina nas calçadas">
+            </div>
+
+            <div class="form-group">
+              <label for="relato-frequencia">Frequência *</label>
+              <select id="relato-frequencia" required>
+                <option value="Diária">Diária (Todo dia)</option>
+                <option value="Intermitente (noturno)">Durante a noite</option>
+                <option value="Sempre que chove forte">Sempre que chove</option>
+                <option value="Finais de semana">Finais de semana</option>
+                <option value="Eventual">Eventual / Ocasional</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Nível de Gravidade Estimado (Botões de Opção) -->
+          <div class="form-group">
+            <label>Nível de Gravidade Estimado *</label>
+            <div class="btn-group-contrast" id="gravity-btn-group">
+              <button type="button" class="btn-contrast" data-gravity="Baixa" style="color: var(--green-dark);">Baixa</button>
+              <button type="button" class="btn-contrast" data-gravity="Média" style="color: #eab308;">Média</button>
+              <button type="button" class="btn-contrast active" data-gravity="Alta" style="color: var(--accent); font-weight: 800;">Alta</button>
+              <button type="button" class="btn-contrast" data-gravity="Crítica" style="color: #rose; color:#C62828;">Crítica</button>
+            </div>
+          </div>
+
+          <!-- Descrição Detalhada -->
+          <div class="form-group">
+            <label for="relato-descricao">Descrição Detalhada do Problema *</label>
+            <textarea id="relato-descricao" rows="5" required placeholder="Forneça detalhes do impacto na saúde, rotina ou bem-estar da sua família. Descreva o odor, cor da poeira ou padrão temporal..."></textarea>
+          </div>
+
+          <!-- Link de Evidência -->
+          <div class="form-group">
+            <label for="relato-evidencia">Link de Imagem / Foto Evidência (Opcional)</label>
+            <input type="url" id="relato-evidencia" placeholder="https://drive.google.com/... (link do drive ou dropbox)">
+          </div>
+
+          <!-- Aceite da LGPD -->
+          <div class="form-group lgpd-group">
+            <input type="checkbox" id="relato-lgpd-checkbox" required>
+            <label for="relato-lgpd-checkbox" style="text-transform: none; font-weight: 400; color: var(--text-secondary);">
+              <strong>Consentimento LGPD:</strong> Estou ciente e concordo com o tratamento dos dados geográficos e de impacto relatados, que serão utilizados exclusivamente de forma coletiva, transparente e estatística no painel ESG, sob a Lei 13.709/18.
+            </label>
+          </div>
+
+          <!-- Botão de Envio com Spinner -->
+          <button type="submit" id="btn-relato-submit" class="btn-submit-form" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>🚀 Enviar Relato Comunitário</span>
+          </button>
+
+        </form>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
+  <!-- Lógica de interação do formulário, integração ViaCEP e localStorage -->
+  <script>
+    let selectedGravity = 'Alta';
+    let isAnonymous = true;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Toggles Anônimo / Identificado
+      const btnAnon = document.getElementById('btn-identity-anon');
+      const btnIdent = document.getElementById('btn-identity-ident');
+      const nameGroup = document.getElementById('group-relato-nome');
+
+      btnAnon.onclick = () => {
+        btnAnon.classList.add('active');
+        btnIdent.classList.remove('active');
+        nameGroup.style.display = 'none';
+        document.getElementById('relato-nome').value = '';
+        isAnonymous = true;
+      };
+
+      btnIdent.onclick = () => {
+        btnIdent.classList.add('active');
+        btnAnon.classList.remove('active');
+        nameGroup.style.display = 'block';
+        isAnonymous = false;
+      };
+
+      // 2. Toggles de Gravidade
+      const gravityBtns = document.querySelectorAll('#gravity-btn-group button');
+      gravityBtns.forEach(btn => {
+        btn.onclick = () => {
+          gravityBtns.forEach(b => { 
+            b.classList.remove('active');
+            b.style.fontWeight = '400';
+          });
+          btn.classList.add('active');
+          btn.style.fontWeight = '800';
+          selectedGravity = btn.getAttribute('data-gravity');
+        };
+      });
+
+      // 3. Preenchimento CEP via API ViaCEP
+      const cepInput = document.getElementById('relato-cep');
+      const feedback = document.getElementById('cep-feedback-status');
+      const loader = document.getElementById('cep-loader');
+
+      cepInput.addEventListener('input', async () => {
+        const val = cepInput.value.replace(/\D/g, '');
+        feedback.textContent = '';
+        if (val.length !== 8) return;
+
+        loader.style.display = 'inline-block';
+        try {
+          const resp = await fetch(`https://viacep.com.br/ws/${val}/json/`);
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data && !data.erro) {
+              document.getElementById('relato-bairro').value = data.bairro || '';
+              document.getElementById('relato-cidade').value = data.localidade || '';
+              document.getElementById('relato-uf').value = data.uf || '';
+              feedback.textContent = '✔️ Endereço autocompletado com sucesso!';
+              feedback.style.color = 'var(--green-medium)';
+            } else {
+              feedback.textContent = '❌ CEP estruturalmente válido, porém inexistente.';
+              feedback.style.color = '#C62828';
+            }
+          } else {
+            feedback.textContent = '⚠️ Serviço ViaCEP temporariamente indisponível.';
+            feedback.style.color = 'var(--accent)';
+          }
+        } catch (e) {
+          console.error("Falha ao buscar CEP", e);
+          feedback.textContent = '⚠️ Falha ao conectar à base postal.';
+          feedback.style.color = 'var(--accent)';
+        } finally {
+          loader.style.display = 'none';
+        }
+      });
+
+      // 4. Atalhos de Preenchimento Rápido
+      const shortcuts = document.querySelectorAll('[data-cep]');
+      shortcuts.forEach(btn => {
+        btn.onclick = () => {
+          cepInput.value = btn.getAttribute('data-cep');
+          document.getElementById('relato-bairro').value = btn.getAttribute('data-bairro');
+          document.getElementById('relato-cidade').value = btn.getAttribute('data-cidade');
+          document.getElementById('relato-uf').value = btn.getAttribute('data-uf');
+          feedback.textContent = '✔️ Endereço preenchido (zona integrada)';
+          feedback.style.color = 'var(--green-medium)';
+        };
+      });
+
+      // 5. Submit do Formulário com IA de Sentimento simulada
+      const form = document.getElementById('form-relato-esg');
+      const errorBox = document.getElementById('error-box-relato');
+      const successWindow = document.getElementById('success-window');
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        errorBox.style.display = 'none';
+
+        const desc = document.getElementById('relato-descricao').value;
+        const problema = document.getElementById('relato-problema').value;
+        const bairro = document.getElementById('relato-bairro').value;
+        const cidade = document.getElementById('relato-cidade').value;
+        const uf = document.getElementById('relato-uf').value;
+        const cep = document.getElementById('relato-cep').value;
+        const categoria = document.getElementById('relato-categoria').value;
+        const frequencia = document.getElementById('relato-frequencia').value;
+        
+        // LGPD consent validation (checkbox)
+        const lgpd = document.getElementById('relato-lgpd-checkbox').checked;
+        if (!lgpd) {
+          errorBox.textContent = 'Você deve aceitar a cláusula LGPD.';
+          errorBox.style.display = 'block';
+          return;
+        }
+
+        if (desc.trim().length < 15) {
+          errorBox.textContent = 'Por favor, detalhe sua descrição (mínimo de 15 caracteres).';
+          errorBox.style.display = 'block';
+          return;
+        }
+
+        // Simulação Análise de Sentimento (IA Heurística)
+        const submitBtn = document.getElementById('btn-relato-submit');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Analisando Sentimento por IA...';
+
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '🚀 Enviar Relato Comunitário';
+
+          // Análise de sentimentos Heurística Local
+          const textLower = (problema + " " + desc).toLowerCase();
+          let analyzedSentiment = 'neutro';
+          
+          if (textLower.match(/(poeira|barulho|ferro|sujo|crítico|ruim|alergia|tosse|horrível|odores|gás)/g)) {
+            analyzedSentiment = 'crítico';
+          } else if (textLower.match(/(limpo|árvores|bom|ótimo|obrigado|reutiliza|organizado)/g)) {
+            analyzedSentiment = 'positivo';
+          }
+
+          // Geração de coordenadas aleatórias em conformidade com o bairro
+          let mapX = 20 + Math.floor(Math.random() * 60);
+          let mapY = 20 + Math.floor(Math.random() * 60);
+
+          if (bairro.toLowerCase().includes('jesuítas')) { mapX = 28 + Math.random() * 6; mapY = 44 + Math.random() * 6; }
+          else if (bairro.toLowerCase().includes('parisi')) { mapX = 44 + Math.random() * 6; mapY = 36 + Math.random() * 6; }
+          else if (bairro.toLowerCase().includes('navegantes')) { mapX = 67 + Math.random() * 6; mapY = 72 + Math.random() * 4; }
+          else if (bairro.toLowerCase().includes('veneza')) { mapX = 21 + Math.random() * 4; mapY = 76 + Math.random() * 4; }
+
+          const activeUser = window.AppDB ? window.AppDB.getActiveUser() : null;
+
+          const novoRelato = {
+            id: String(Date.now()),
+            bairro,
+            cidade,
+            uf: uf.toUpperCase(),
+            cep,
+            problema,
+            descricao: desc,
+            gravidade: selectedGravity,
+            categoria,
+            frequência: frequencia,
+            autor: isAnonymous ? 'Relato Anônimo' : (document.getElementById('relato-nome').value || 'Morador Identificado'),
+            data: new Date().toISOString().split('T')[0],
+            coordenadas: { x: Math.round(mapX), y: Math.round(mapY) },
+            vulnerabilidade: Math.random() > 0.4 ? 'Alta' : 'Média',
+            numRelatos: 1,
+            sentimento: analyzedSentiment,
+            userEmail: activeUser ? activeUser.email : undefined // Vincula se estiver logado
+          };
+
+          // Salva no localStorage via AppDB
+          if (window.AppDB) {
+            window.AppDB.addRelato(novoRelato);
+          }
+
+          // Mostra sucesso
+          form.style.display = 'none';
+          successWindow.style.display = 'flex';
+
+        }, 1200);
+      };
+
+      // Reinicialização do form de sucesso
+      document.getElementById('btn-success-reset').onclick = () => {
+        form.reset();
+        feedback.textContent = '';
+        form.style.display = 'flex';
+        successWindow.style.display = 'none';
+      };
+
+    });
+  </script>
+
+</body>
+</html>

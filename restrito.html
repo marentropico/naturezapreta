@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área Restrita do Gestor - Ouvidoria ESG | EcoVoz</title>
+  
+  <!-- Estilos e Fontes do Design System -->
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <!-- Dependências de Script da Aplicação (Ordem Correta) -->
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
+  
+  <!-- Dependência jsPDF via CDN para Geração do Dossiê ESG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <style>
+    /* Estilos Adicionais Específicos para a Área Restrita */
+    .restrito-secao {
+      padding: 48px 0;
+    }
+    
+    .perfil-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      md-flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      text-align: left;
+      margin-bottom: 32px;
+    }
+    
+    .perfil-esquerda {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .perfil-avatar {
+      background-color: var(--green-dark);
+      color: #FFFFFF;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .stats-perfil-row {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .stat-perfil-box {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      min-width: 110px;
+    }
+    
+    .stat-perfil-box span.val {
+      display: block;
+      font-size: 22px;
+      font-weight: 950;
+      color: var(--green-dark);
+    }
+    
+    .stat-perfil-box span.lbl {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 850;
+    }
+    
+    /* Abas de Navegação Administrativa */
+    .tabs-admin-row {
+      display: flex;
+      flex-direction: column;
+      sm-flex-direction: row;
+      justify-content: space-between;
+      align-items: start;
+      sm-align-items: center;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    
+    .tabs-admin-botoes {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .btn-tab-admin {
+      padding: 12px 4px;
+      font-size: 14px;
+      font-weight: 850;
+      color: var(--text-secondary);
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+    
+    .btn-tab-admin.active {
+      color: var(--green-dark);
+      border-bottom-color: var(--green-dark);
+    }
+    
+    .btn-tab-admin:hover {
+      color: var(--green-medium);
+    }
+    
+    /* Cartões dos Itens Listados */
+    .item-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .item-admin-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      md-flex-direction: row;
+      justify-content: space-between;
+      align-items: start;
+      md-align-items: center;
+      gap: 20px;
+      text-align: left;
+      transition: border-color var(--transition-fast);
+    }
+    
+    .item-admin-card:hover {
+      border-color: rgba(47, 107, 79, 0.3);
+    }
+    
+    .item-admin-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .item-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .item-admin-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--green-dark);
+      line-height: 1.3;
+    }
+    
+    .item-admin-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .item-admin-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    
+    .item-admin-subcard {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    .item-admin-controles {
+      display: flex;
+      flex-direction: row;
+      md-flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      md-width: auto;
+      justify-content: flex-end;
+      border-top: 1px solid var(--border-color);
+      padding-top: 16px;
+      md-border-top: none;
+      md-padding-top: 0;
+    }
+    
+    /* Botões operacionais */
+    .btn-operacao {
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 750;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid var(--border-color);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+    
+    .btn-operacao-edit {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+    }
+    
+    .btn-operacao-edit:hover {
+      background-color: var(--green-tint);
+      color: var(--green-dark);
+      border-color: var(--green-light);
+    }
+    
+    .btn-operacao-delete {
+      background-color: #FFEBEE;
+      color: #C62828;
+      border-color: #FFCDD2;
+    }
+    
+    .btn-operacao-delete:hover {
+      background-color: #FFCDD2;
+    }
+    
+    /* Badge de Gravidade */
+    .badge-gravity {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+    .bg-critica { background-color: #FFEBEE; color: #C62828; border-color: #FFCDD2; }
+    .bg-alta { background-color: #FFF3E0; color: #C44A1C; border-color: #F6C56B; }
+    .bg-media { background-color: #FEF08A; color: #A16207; border-color: #FDE047; }
+    .bg-baixa { background-color: #E8F1EA; color: #123524; border-color: #A8CBB1; }
+    
+    /* Badge de Status da Proposta */
+    .badge-status-proposta {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+    .status-discutir { background-color: #FEF08A; color: #A16207; border-color: #FDE047; }
+    .status-andamento { background-color: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
+    .status-concluido { background-color: #E8F1EA; color: #123524; border-color: #A8CBB1; }
+    
+    /* Custom select de progresso rápido */
+    .select-status-quick {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--green-dark);
+      padding: 6px 12px;
+      outline: none;
+      cursor: pointer;
+      margin-top: 4px;
+      width: fit-content;
+      transition: border-color var(--transition-fast);
+    }
+    .select-status-quick:focus {
+      border-color: var(--green-medium);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="pt-compensate">
+    <div class="container-limite restrito-secao">
+      
+      <!-- LOCK CONTAINER: VISÍVEL CASO O USUÁRIO NÃO ESTEJA LOGADO -->
+      <section id="lock-screen-container" style="display: none; padding: 64px 0;">
+        <div class="sobre-pilares-card animate-scale-up" style="max-width: 580px; margin: 0 auto; padding: 48px 32px; text-align: center; background-color: #FFFFFF;">
+          <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+          <h3 style="font-size: 24px; font-weight: 900; color: var(--green-dark); margin-bottom: 12px;">
+            Acesso Restrito ao Gestor
+          </h3>
+          <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+            Esta seção contém o gerenciamento dos seus relatos territoriais e propostas mitigadoras submetidas. Para visualizar e interagir com seus envios pessoais, efetue o login clicando no botão <strong>"Entrar"</strong> localizado no cabeçalho superior.
+          </p>
+          
+          <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; font-size: 12px; color: var(--text-secondary); text-align: left;">
+            💡 <strong>Dica de Demonstração:</strong> Você pode fazer login utilizando a conta corporativa padrão de testes:<br>
+            • E-mail: <strong style="color: var(--green-dark);">gestor@ecovoz.com.br</strong><br>
+            • Senha: <strong style="color: var(--green-dark);">123456</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMIN CONTAINER: VISÍVEL APENAS PARA USUÁRIOS LOGADOS -->
+      <section id="admin-panel-container" style="display: none;">
+        
+        <!-- Cartão de Perfil do Usuário Logado -->
+        <article class="perfil-card animate-scale-up">
+          <div class="perfil-esquerda">
+            <div class="perfil-avatar">👤</div>
+            <div>
+              <span class="badge-esg">Perfil Ouvidoria Ativo</span>
+              <h2 id="perfil-username" style="font-size: 26px; font-weight: 900; color: var(--green-dark); margin-top: 4px; letter-spacing: -0.5px;">
+                Carregando usuário...
+              </h2>
+              <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;">
+                E-mail corporativo de acesso: <strong id="perfil-email" style="color: var(--text-main);">...</strong>
+              </p>
+            </div>
+          </div>
+          
+          <div class="stats-perfil-row">
+            <div class="stat-perfil-box">
+              <span class="val" id="stats-relatos-val">0</span>
+              <span class="lbl">Seus relatos</span>
+            </div>
+            <div class="stat-perfil-box">
+              <span class="val" id="stats-propostas-val">0</span>
+              <span class="lbl">Suas propostas</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Barra de Abas e Ações Secundárias -->
+        <div class="tabs-admin-row">
+          <div class="tabs-admin-botoes">
+            <button type="button" class="btn-tab-admin active" id="tab-relatos-trigger">
+              📁 Gerenciar Seus Relatos (<span id="tab-count-relatos">0</span>)
+            </button>
+            <button type="button" class="btn-tab-admin" id="tab-propostas-trigger">
+              💡 Gerenciar Suas Propostas (<span id="tab-count-propostas">0</span>)
+            </button>
+          </div>
+          
+          <button type="button" class="btn-submit-form" id="btn-export-pdf" style="margin-top: 0; padding: 10px 18px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+            <span>📥 Exportar Seus Relatos (PDF)</span>
+          </button>
+        </div>
+
+        <!-- LISTAS DE ITENS -->
+        <!-- Aba 1: Relatos do Usuário -->
+        <div class="item-list-container" id="lista-relatos-admin">
+          <!-- Injetado dinamicamente -->
+        </div>
+
+        <!-- Aba 2: Propostas do Usuário (Inicialmente oculta) -->
+        <div class="item-list-container" id="lista-propostas-admin" style="display: none;">
+          <!-- Injetado dinamicamente -->
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+     MODAIS DE EDIÇÃO E CONFIRMAÇÃO (CRUD)
+     ========================================================================== -->
+  
+  <!-- MODAL: EDITAR RELATO -->
+  <div class="modal-overlay" id="modal-edit-relato-overlay">
+    <div class="modal-card animate-scale-up" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
+      <button type="button" class="modal-close-btn" id="btn-close-edit-relato">&times;</button>
+      
+      <div class="modal-header-text" style="text-align: left; margin-bottom: 20px;">
+        <span class="modal-eyebrow">Edição Ética de Relato</span>
+        <h3>Editar Relato de Incidente</h3>
+        <p>Ajuste as informações da queixa para correção ou atualização de status socioambiental.</p>
+      </div>
+      
+      <form id="form-edit-relato" class="modal-form">
+        <input type="hidden" id="edit-relato-id">
+        
+        <div class="form-group">
+          <label for="edit-relato-bairro">Região / Bairro *</label>
+          <input type="text" id="edit-relato-bairro" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-relato-problema">Resumo do Problema *</label>
+          <input type="text" id="edit-relato-problema" required>
+        </div>
+        
+        <div class="grid-2-col" style="display: grid; grid-template-cols: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="edit-relato-categoria">Categoria</label>
+            <select id="edit-relato-categoria" required>
+              <option value="Ar">Ar / Atmosférico</option>
+              <option value="Água">Água / Estuário</option>
+              <option value="Ruído">Ruído / Acústico</option>
+              <option value="Resíduos">Resíduos Sólidos</option>
+              <option value="Mobilidade">Mobilidade</option>
+              <option value="Verde urbano">Verde Urbano</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-relato-gravidade">Gravidade</label>
+            <select id="edit-relato-gravidade" required>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+              <option value="Crítica">Crítica</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-relato-frequencia">Frequência *</label>
+          <input type="text" id="edit-relato-frequencia" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-relato-descricao">Descrição Inteira *</label>
+          <textarea id="edit-relato-descricao" rows="4" style="resize: none;" required></textarea>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+          <button type="button" class="btn-operacao btn-operacao-edit" id="btn-cancel-edit-relato" style="padding: 12px 20px;">Cancelar</button>
+          <button type="submit" class="btn-submit-form" style="margin-top: 0; padding: 12px 20px;">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR PROPOSTA -->
+  <div class="modal-overlay" id="modal-edit-proposta-overlay">
+    <div class="modal-card animate-scale-up" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
+      <button type="button" class="modal-close-btn" id="btn-close-edit-proposta">&times;</button>
+      
+      <div class="modal-header-text" style="text-align: left; margin-bottom: 20px;">
+        <span class="modal-eyebrow">Edição ESG Corporativa</span>
+        <h3>Editar Proposta de Lógica Sustentável</h3>
+        <p>Ajuste os parâmetros operacionais da proposta sugerida para avaliação técnica dos comitês.</p>
+      </div>
+      
+      <form id="form-edit-proposta" class="modal-form">
+        <input type="hidden" id="edit-proposta-id">
+        
+        <div class="form-group">
+          <label for="edit-proposta-titulo">Título da Proposta *</label>
+          <input type="text" id="edit-proposta-titulo" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-proposta-problema">Qual queixa ou problema ela se direciona? *</label>
+          <input type="text" id="edit-proposta-problema" required>
+        </div>
+        
+        <div class="grid-2-col" style="display: grid; grid-template-cols: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="edit-proposta-viabilidade">Viabilidade Técnica</label>
+            <select id="edit-proposta-viabilidade" required>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-proposta-custo">Custo Estimado</label>
+            <select id="edit-proposta-custo" required>
+              <option value="Baixo">Baixo</option>
+              <option value="Médio">Médio</option>
+              <option value="Alto">Alto</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-proposta-prazo">Prazo de Execução *</label>
+          <input type="text" id="edit-proposta-prazo" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-proposta-descricao">Escopo / Descrição Técnica *</label>
+          <textarea id="edit-proposta-descricao" rows="3" style="resize: none;" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-proposta-impacto">Impacto Socioambiental Esperado *</label>
+          <textarea id="edit-proposta-impacto" rows="2" style="resize: none;" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="edit-proposta-status">Status de Progresso</label>
+          <select id="edit-proposta-status" required>
+            <option value="Em Discussão">Em Discussão</option>
+            <option value="Em Andamento">Em Andamento</option>
+            <option value="Implementado">Implementado</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+          <button type="button" class="btn-operacao btn-operacao-edit" id="btn-cancel-edit-proposta" style="padding: 12px 20px;">Cancelar</button>
+          <button type="submit" class="btn-submit-form" style="margin-top: 0; padding: 12px 20px;">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAÇÃO DE EXCLUSÃO -->
+  <div class="modal-overlay" id="modal-delete-confirm-overlay">
+    <div class="modal-card animate-scale-up" style="max-width: 380px; text-align: center; padding: 32px 24px;">
+      <div style="font-size: 40px; color: #C62828; margin-bottom: 12px;">⚠️</div>
+      <h3 style="font-size: 18px; font-weight: 950; color: var(--green-dark); margin-bottom: 8px;">
+        Excluir Registro Definitivamente?
+      </h3>
+      <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+        Esta ação não pode ser desfeita. O item será permanentemente removido das estatísticas e mapas integrados da plataforma.
+      </p>
+      
+      <input type="hidden" id="delete-item-id">
+      <input type="hidden" id="delete-item-type">
+      
+      <div style="display: flex; gap: 12px;">
+        <button type="button" class="btn-operacao btn-operacao-edit" id="btn-cancel-delete" style="flex: 1; padding: 12px;">Não, Cancelar</button>
+        <button type="button" class="btn-operacao btn-operacao-delete" id="btn-confirm-delete" style="flex: 1; padding: 12px;">Sim, Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
+  <!-- Lógica de Controle do Painel Restrito (Login e CRUD de relatos/propostas) -->
+  <script>
+    let activeTab = 'relatos'; // 'relatos' ou 'propostas'
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Verifica estado de login
+      checkAuthAndRender();
+      
+      // 2. Associa eventos das Abas
+      document.getElementById('tab-relatos-trigger').onclick = () => switchTab('relatos');
+      document.getElementById('tab-propostas-trigger').onclick = () => switchTab('propostas');
+      
+      // 3. Modais Closes
+      document.getElementById('btn-close-edit-relato').onclick = () => closeModals();
+      document.getElementById('btn-cancel-edit-relato').onclick = () => closeModals();
+      document.getElementById('btn-close-edit-proposta').onclick = () => closeModals();
+      document.getElementById('btn-cancel-edit-proposta').onclick = () => closeModals();
+      document.getElementById('btn-cancel-delete').onclick = () => closeModals();
+      
+      // 4. Submits de Formulários de Edição
+      document.getElementById('form-edit-relato').onsubmit = handleSaveRelato;
+      document.getElementById('form-edit-proposta').onsubmit = handleSaveProposta;
+      document.getElementById('btn-confirm-delete').onclick = handleExecuteDelete;
+      
+      // 5. Botão de Exportação de PDF
+      document.getElementById('btn-export-pdf').onclick = exportRelatosPDF;
+    });
+
+    /**
+     * Valida login ativo no localStorage e renderiza o container correto
+     */
+    function checkAuthAndRender() {
+      const activeUser = window.AppDB ? window.AppDB.getActiveUser() : null;
+      const lockScreen = document.getElementById('lock-screen-container');
+      const adminPanel = document.getElementById('admin-panel-container');
+
+      if (!activeUser) {
+        lockScreen.style.display = 'block';
+        adminPanel.style.display = 'none';
+      } else {
+        lockScreen.style.display = 'none';
+        adminPanel.style.display = 'block';
+        
+        // Carrega dados do perfil
+        document.getElementById('perfil-username').textContent = `Olá, ${activeUser.name}!`;
+        document.getElementById('perfil-email').textContent = activeUser.email;
+        
+        // Desenha tabelas administrativas
+        refreshAdminData();
+      }
+    }
+
+    /**
+     * Alterna visualização entre relatos e propostas
+     */
+    function switchTab(tabName) {
+      activeTab = tabName;
+      const tRelatos = document.getElementById('tab-relatos-trigger');
+      const tPropostas = document.getElementById('tab-propostas-trigger');
+      const listRel = document.getElementById('lista-relatos-admin');
+      const listProp = document.getElementById('lista-propostas-admin');
+
+      if (tabName === 'relatos') {
+        tRelatos.classList.add('active');
+        tPropostas.classList.remove('active');
+        listRel.style.display = 'flex';
+        listProp.style.display = 'none';
+      } else {
+        tPropostas.classList.add('active');
+        tRelatos.classList.remove('active');
+        listProp.style.display = 'flex';
+        listRel.style.display = 'none';
+      }
+    }
+
+    /**
+     * Atualiza dados de relatos e propostas do usuário logado na UI
+     */
+    function refreshAdminData() {
+      if (!window.AppDB) return;
+
+      const currentUser = window.AppDB.getActiveUser();
+      if (!currentUser) return;
+
+      const todosRelatos = window.AppDB.getRelatos() || [];
+      const todasPropostas = window.AppDB.getPropostas() || [];
+
+      // Filtra por usuário logado
+      const userRelatos = todosRelatos.filter(r => r.userEmail === currentUser.email);
+      const userPropostas = todasPropostas.filter(p => p.userEmail === currentUser.email);
+
+      // Atualiza contadores
+      document.getElementById('stats-relatos-val').textContent = userRelatos.length;
+      document.getElementById('stats-propostas-val').textContent = userPropostas.length;
+      document.getElementById('tab-count-relatos').textContent = userRelatos.length;
+      document.getElementById('tab-count-propostas').textContent = userPropostas.length;
+
+      // Desenha lista de relatos
+      renderRelatosList(userRelatos);
+
+      // Desenha lista de propostas
+      renderPropostasList(userPropostas);
+    }
+
+    /**
+     * Injeta lista de relatos na página
+     */
+    function renderRelatosList(relatos) {
+      const container = document.getElementById('lista-relatos-admin');
+      if (!container) return;
+
+      if (relatos.length === 0) {
+        container.innerHTML = `
+          <div class="sobre-pilares-card" style="padding: 48px; text-align: center; width:100%; background-color:#FFFFFF;">
+            <div style="font-size: 36px; opacity: 0.5;">📁</div>
+            <h4 style="font-size: 16px; font-weight: 850; color: var(--green-dark); margin-top: 12px;">Você ainda não registrou nenhum relato</h4>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Registre suas queixas territoriais na página de "Relatar" para visualizá-las aqui.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = relatos.map(r => {
+        const bgClass = r.gravidade === 'Crítica' ? 'bg-critica' :
+                        r.gravidade === 'Alta' ? 'bg-alta' :
+                        r.gravidade === 'Média' ? 'bg-media' : 'bg-baixa';
+
+        return `
+          <article class="item-admin-card animate-scale-up" id="card-relato-${r.id}">
+            <div class="item-admin-info">
+              <div class="item-tags-row">
+                <span class="badge-esg" style="padding: 4px 10px; font-size: 9px;">${r.categoria}</span>
+                <span class="badge-gravity ${bgClass}">Gravidade ${r.gravidade}</span>
+                <span class="item-admin-meta">📅 ${r.data}</span>
+              </div>
+              <div>
+                <h4 class="item-admin-title">${r.problema}</h4>
+                <p class="item-admin-meta">Bairro: <strong style="color: var(--text-main);">${r.bairro}</strong> • Frequência: ${r.frequência || 'Diária'}</p>
+              </div>
+              <p class="item-admin-desc">${r.descricao}</p>
+            </div>
+            
+            <div class="item-admin-controles">
+              <button type="button" class="btn-operacao btn-operacao-edit" onclick="triggerEditRelato('${r.id}')">
+                ✏️ Editar
+              </button>
+              <button type="button" class="btn-operacao btn-operacao-delete" onclick="triggerDelete('${r.id}', 'relatos')">
+                🗑️ Excluir
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Injeta lista de propostas na página
+     */
+    function renderPropostasList(propostas) {
+      const container = document.getElementById('lista-propostas-admin');
+      if (!container) return;
+
+      if (propostas.length === 0) {
+        container.innerHTML = `
+          <div class="sobre-pilares-card" style="padding: 48px; text-align: center; width:100%; background-color:#FFFFFF;">
+            <div style="font-size: 36px; opacity: 0.5;">💡</div>
+            <h4 style="font-size: 16px; font-weight: 850; color: var(--green-dark); margin-top: 12px;">Você ainda não enviou propostas de soluções</h4>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Sua contribuição técnica integradora pode ser inserida na página de "Soluções".</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = propostas.map(p => {
+        const st = p.status || 'Em Discussão';
+        const stClass = st === 'Implementado' ? 'status-concluido' :
+                        st === 'Em Andamento' ? 'status-andamento' : 'status-discutir';
+
+        return `
+          <article class="item-admin-card animate-scale-up" id="card-proposta-${p.id}">
+            <div class="item-admin-info">
+              <div class="item-tags-row">
+                <span class="badge-esg" style="padding: 4px 10px; font-size: 9px; background-color:#E0F2FE; color:#0369A1; border-color:#BAE6FD;">${p.categoria}</span>
+                <span class="badge-status-proposta ${stClass}">Status: ${st}</span>
+                <span class="badge-gravity bg-baixa" style="color: var(--green-medium);">Viabilidade ${p.viabilidade}</span>
+                <span class="badge-gravity bg-alta" style="color: var(--accent-dark); background-color: #FFF3E0;">Custo ${p.custo}</span>
+              </div>
+              <div>
+                <h4 class="item-admin-title">${p.titulo}</h4>
+                <p class="item-admin-meta" style="color: var(--green-medium);">Alvo: ${p.problemaRelacionado}</p>
+              </div>
+              <p class="item-admin-desc">${p.descricao}</p>
+              
+              <div class="item-admin-subcard">
+                <strong>Impacto Esperado:</strong> ${p.impacto}
+              </div>
+              
+              <div class="form-group" style="margin-top: 6px;">
+                <label style="font-size: 10px;">Alterar Status de Acompanhamento:</label>
+                <select class="select-status-quick" onchange="quickUpdatePropostaStatus('${p.id}', this.value)">
+                  <option value="Em Discussão" ${st === 'Em Discussão' ? 'selected' : ''}>Em Discussão</option>
+                  <option value="Em Andamento" ${st === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                  <option value="Implementado" ${st === 'Implementado' ? 'selected' : ''}>Implementado</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="item-admin-controles">
+              <button type="button" class="btn-operacao btn-operacao-edit" onclick="triggerEditProposta('${p.id}')">
+                ✏️ Editar
+              </button>
+              <button type="button" class="btn-operacao btn-operacao-delete" onclick="triggerDelete('${p.id}', 'propostas')">
+                🗑️ Excluir
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Fecha todos os modais abertos
+     */
+    function closeModals() {
+      const overlays = document.querySelectorAll('.modal-overlay');
+      overlays.forEach(o => {
+        // Ignora o auth-modal-overlay injetado pelo main.js
+        if (o.id !== 'auth-modal-overlay') {
+          o.classList.remove('modal-visible');
+        }
+      });
+    }
+
+    /**
+     * Gatilho para abrir modal de exclusão
+     */
+    window.triggerDelete = function(id, type) {
+      document.getElementById('delete-item-id').value = id;
+      document.getElementById('delete-item-type').value = type;
+      document.getElementById('modal-delete-confirm-overlay').classList.add('modal-visible');
+    }
+
+    /**
+     * Lógica de execução de exclusão do relato/proposta
+     */
+    function handleExecuteDelete() {
+      const id = document.getElementById('delete-item-id').value;
+      const type = document.getElementById('delete-item-type').value;
+
+      if (window.AppDB) {
+        if (type === 'relatos') {
+          window.AppDB.deleteRelato(id);
+        } else {
+          window.AppDB.deleteProposta(id);
+        }
+        closeModals();
+        refreshAdminData();
+      }
+    }
+
+    /**
+     * Gatilho para editar relato (abre modal e carrega campos)
+     */
+    window.triggerEditRelato = function(id) {
+      if (!window.AppDB) return;
+      const relatos = window.AppDB.getRelatos();
+      const r = relatos.find(item => item.id === id);
+      if (!r) return;
+
+      document.getElementById('edit-relato-id').value = r.id;
+      document.getElementById('edit-relato-bairro').value = r.bairro;
+      document.getElementById('edit-relato-problema').value = r.problema;
+      document.getElementById('edit-relato-categoria').value = r.categoria;
+      document.getElementById('edit-relato-gravidade').value = r.gravidade;
+      document.getElementById('edit-relato-frequencia').value = r.frequência || 'Diária';
+      document.getElementById('edit-relato-descricao').value = r.descricao;
+
+      document.getElementById('modal-edit-relato-overlay').classList.add('modal-visible');
+    }
+
+    /**
+     * Salva alterações do relato
+     */
+    function handleSaveRelato(e) {
+      e.preventDefault();
+      if (!window.AppDB) return;
+
+      const id = document.getElementById('edit-relato-id').value;
+      const relatos = window.AppDB.getRelatos();
+      const rOriginal = relatos.find(item => item.id === id);
+      if (!rOriginal) return;
+
+      const updated = {
+        ...rOriginal,
+        bairro: document.getElementById('edit-relato-bairro').value,
+        problema: document.getElementById('edit-relato-problema').value,
+        categoria: document.getElementById('edit-relato-categoria').value,
+        gravidade: document.getElementById('edit-relato-gravidade').value,
+        frequência: document.getElementById('edit-relato-frequencia').value,
+        descricao: document.getElementById('edit-relato-descricao').value
+      };
+
+      window.AppDB.updateRelato(updated);
+      closeModals();
+      refreshAdminData();
+    }
+
+    /**
+     * Gatilho para editar proposta (abre modal e carrega campos)
+     */
+    window.triggerEditProposta = function(id) {
+      if (!window.AppDB) return;
+      const propostas = window.AppDB.getPropostas();
+      const p = propostas.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('edit-proposta-id').value = p.id;
+      document.getElementById('edit-proposta-titulo').value = p.titulo;
+      document.getElementById('edit-proposta-problema').value = p.problemaRelacionado;
+      document.getElementById('edit-proposta-viabilidade').value = p.viabilidade;
+      document.getElementById('edit-proposta-custo').value = p.custo;
+      document.getElementById('edit-proposta-prazo').value = p.prazo;
+      document.getElementById('edit-proposta-descricao').value = p.descricao;
+      document.getElementById('edit-proposta-impacto').value = p.impacto;
+      document.getElementById('edit-proposta-status').value = p.status || 'Em Discussão';
+
+      document.getElementById('modal-edit-proposta-overlay').classList.add('modal-visible');
+    }
+
+    /**
+     * Salva alterações de proposta
+     */
+    function handleSaveProposta(e) {
+      e.preventDefault();
+      if (!window.AppDB) return;
+
+      const id = document.getElementById('edit-proposta-id').value;
+      const propostas = window.AppDB.getPropostas();
+      const pOriginal = propostas.find(item => item.id === id);
+      if (!pOriginal) return;
+
+      const updated = {
+        ...pOriginal,
+        titulo: document.getElementById('edit-proposta-titulo').value,
+        problemaRelacionado: document.getElementById('edit-proposta-problema').value,
+        viabilidade: document.getElementById('edit-proposta-viabilidade').value,
+        custo: document.getElementById('edit-proposta-custo').value,
+        prazo: document.getElementById('edit-proposta-prazo').value,
+        descricao: document.getElementById('edit-proposta-descricao').value,
+        impacto: document.getElementById('edit-proposta-impacto').value,
+        status: document.getElementById('edit-proposta-status').value
+      };
+
+      window.AppDB.updateProposta(updated);
+      closeModals();
+      refreshAdminData();
+    }
+
+    /**
+     * Atualização rápida do status da proposta através do select inline
+     */
+    window.quickUpdatePropostaStatus = function(id, nextStatus) {
+      if (!window.AppDB) return;
+      const propostas = window.AppDB.getPropostas();
+      const pOriginal = propostas.find(item => item.id === id);
+      if (!pOriginal) return;
+
+      const updated = {
+        ...pOriginal,
+        status: nextStatus
+      };
+
+      window.AppDB.updateProposta(updated);
+      refreshAdminData();
+    }
+
+    /**
+     * Lógica de Exportação de PDF utilizando jsPDF carregado via CDN
+     */
+    function exportRelatosPDF() {
+      const activeUser = window.AppDB ? window.AppDB.getActiveUser() : null;
+      if (!activeUser) return;
+
+      const todosRelatos = window.AppDB.getRelatos() || [];
+      const userRelatos = todosRelatos.filter(r => r.userEmail === activeUser.email);
+
+      if (userRelatos.length === 0) {
+        alert("Você não possui relatos registrados para exportar.");
+        return;
+      }
+
+      // Inicializa jsPDF no namespace correto da CDN
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Cores do Dossiê ESG
+      const primaryGreen = [18, 53, 36]; // #123524
+      const textDark = [22, 35, 28]; // #16231C
+      const textGray = [75, 95, 85]; // #4B5F55
+      const accentOrange = [242, 140, 40]; // #F28C28
+
+      // Banner Superior
+      doc.setFillColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
+      doc.rect(0, 0, 210, 36, 'F');
+
+      // Título do Dossiê
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.text('CANAIS DE OUVIDORIA & TRANSPARÊNCIA ESG', 15, 14);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(168, 203, 177); // Verde claro suave
+      doc.text('Dossiê Individual de Ocorrências e Relatos de Impacto', 15, 20);
+      doc.text(`Compilação gerada em: ${new Date().toLocaleString('pt-BR')}`, 15, 25);
+
+      // Metadados do usuário logado
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(accentOrange[0], accentOrange[1], accentOrange[2]);
+      doc.text(`Usuário Relatante: ${activeUser.name} (${activeUser.email})`, 15, 31);
+
+      // Divisor
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('Resumo de Relatos Submetidos', 15, 48);
+
+      doc.setDrawColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
+      doc.setLineWidth(0.5);
+      doc.line(15, 51, 195, 51);
+
+      // Painel de Estatística Rápida
+      doc.setFillColor(244, 247, 242);
+      doc.rect(15, 56, 180, 14, 'F');
+      doc.setDrawColor(221, 232, 216);
+      doc.setLineWidth(0.25);
+      doc.rect(15, 56, 180, 14, 'D');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+      doc.text('ESTATÍSTICA DE COMPLIANCE:', 20, 64);
+      doc.setTextColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
+      doc.setFontSize(9);
+      doc.text(`${userRelatos.length} relatos registrados no perfil de ouvidoria`, 76, 64);
+
+      let currentY = 80;
+
+      // Desenha cada relato
+      userRelatos.forEach((r, idx) => {
+        // Quebra de página automática
+        if (currentY > 240) {
+          doc.addPage();
+          currentY = 20;
+        }
+
+        // Fundo do cabeçalho da queixa
+        doc.setFillColor(248, 250, 247);
+        doc.rect(15, currentY, 180, 8, 'F');
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
+        doc.text(`Relato #${idx + 1} - Categoria: ${r.categoria}`, 18, currentY + 5);
+
+        // Nível de Gravidade
+        if (r.gravidade === 'Crítica') {
+          doc.setTextColor(198, 40, 40);
+        } else if (r.gravidade === 'Alta') {
+          doc.setTextColor(accentOrange[0], accentOrange[1], accentOrange[2]);
+        } else {
+          doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+        }
+        doc.text(`Gravidade: ${r.gravidade}`, 120, currentY + 5);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.text(`Data: ${r.data}`, 162, currentY + 5);
+
+        currentY += 14;
+
+        // Problema / Chamado
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
+        doc.text(r.problema, 15, currentY);
+
+        currentY += 5;
+
+        // Bairro e Frequência
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.text(`Localidade/Bairro: ${r.bairro}  |  Frequência Relatada: ${r.frequência || 'Diária'}`, 15, currentY);
+
+        currentY += 6;
+
+        // Descrição da ocorrência com quebra de linha
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+        
+        const splitDesc = doc.splitTextToSize(r.descricao, 178);
+        const descHeight = splitDesc.length * 4.5;
+
+        if (currentY + descHeight > 270) {
+          doc.addPage();
+          currentY = 20;
+        }
+
+        doc.text(splitDesc, 15, currentY);
+        currentY += descHeight + 6;
+
+        // Divisor entre relatos
+        doc.setDrawColor(221, 232, 216);
+        doc.setLineWidth(0.2);
+        doc.line(15, currentY, 195, currentY);
+
+        currentY += 10;
+      });
+
+      // Assinatura e rodapé do documento
+      if (currentY > 260) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      currentY = Math.max(currentY, 260);
+      doc.setDrawColor(primaryGreen[0], primaryGreen[1], primaryGreen[2]);
+      doc.setLineWidth(0.3);
+      doc.line(15, currentY, 195, currentY);
+
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(7.5);
+      doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+      doc.text('EcoVoz - Governança contra o Racismo Ambiental. Gerado de forma automatizada pelo canal ético.', 15, currentY + 5);
+      doc.text('Os relatos expostos são de responsabilidade do usuário autenticado no banco de dados corporativo.', 15, currentY + 9);
+
+      // Salva arquivo com o nome formatado do usuário
+      const nameClean = activeUser.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+      doc.save(`meus-relatos-esg-${nameClean}.pdf`);
+    }
+  </script>
+</body>
+</html>

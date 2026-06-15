@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico Socioambiental e Casos de Impacto | EcoVoz</title>
+  
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
+
+  <main class="pt-compensate">
+    <div class="container-limite">
+      
+      <!-- CABEÇALHO DA SEÇÃO DE DIAGNÓSTICO -->
+      <section class="header-dores-intro">
+        <div class="dores-title-wrapper">
+          <span class="badge-esg badge-esg-alerta">Diagnóstico socioambiental</span>
+          <h1>Impactos no Território</h1>
+          <p>
+            Análise de dados públicos oficiais e exemplos de relatos organizados para demonstrar como o EcoVoz sistematiza as vozes do território em priorização de governança.
+          </p>
+        </div>
+
+        <!-- Seletor de Abas Acessível -->
+        <div class="tab-buttons-wrapper" role="tablist" aria-label="Abas do Diagnóstico">
+          <button type="button" id="tab-btn-indicadores" class="btn-tab-dores active" role="tab" aria-selected="true" aria-controls="panel-indicadores">
+            📊 Indicadores oficiais
+          </button>
+          <button type="button" id="tab-btn-relatos" class="btn-tab-dores inactive" role="tab" aria-selected="false" aria-controls="panel-relatos">
+            💬 Relatos demonstrativos
+          </button>
+          <button type="button" id="tab-btn-evidencias" class="btn-tab-dores inactive" role="tab" aria-selected="false" aria-controls="panel-evidencias">
+            📰 Fontes e evidências
+          </button>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           ABA 1: INDICADORES OFICIAIS (Ativa por padrão)
+           ========================================== -->
+      <div id="panel-indicadores" role="tabpanel" aria-labelledby="tab-btn-indicadores" class="animate-fade-in">
+        
+        <!-- Grid de 4 Estatísticas Oficiais do Censo/Ipea -->
+        <div class="stats-grid-dores">
+          
+          <article class="stat-card-dores">
+            <div class="top">
+              <span class="badge-esg">Dado oficial</span>
+              <span style="font-size: 16px;">🏠</span>
+            </div>
+            <strong>83,5%</strong>
+            <span class="category">Saneamento Desigual</span>
+            <h3>Famílias sem banheiro chefiadas por negros</h3>
+            <p>De mais de 1,2 milhão de famílias brasileiras vivendo em domicílios sem banheiro de uso exclusivo, a esmagadora maioria é preta ou parda.</p>
+            <a href="https://www.ipea.gov.br/portal/categories/45-todas-as-noticias/noticias/16114-brasil-tem-mais-de-1-2-milhao-de-familias-que-vivem-em-casas-sem-banheiro-83-5-delas-sao-chefiadas-por-pessoas-negras-e-70-por-mulheres" target="_blank" rel="noopener" class="link-fonte-esg">
+              Fonte: Ipea &rarr;
+            </a>
+          </article>
+
+          <article class="stat-card-dores">
+            <div class="top">
+              <span class="badge-esg">Dado oficial</span>
+              <span style="font-size: 16px;">🚰</span>
+            </div>
+            <strong>62,5%</strong>
+            <span class="category">Esgotamento Sanitário</span>
+            <h3>Acesso Geral ao Esgoto no Censo 2022</h3>
+            <p>A rede nacional de esgoto alcança 62,5% da população, contudo existem severas assimetrias históricas por raça, cor e renda periférica.</p>
+            <a href="https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/39237-censo-2022-rede-de-esgoto-alcanca-62-5-da-populacao-mas-desigualdades-regionais-e-por-cor-e-raca-persistem" target="_blank" rel="noopener" class="link-fonte-esg">
+              Fonte: IBGE Censo 2022 &rarr;
+            </a>
+          </article>
+
+          <article class="stat-card-dores">
+            <div class="top">
+              <span class="badge-esg">Dado oficial</span>
+              <span style="font-size: 16px;">🗺️</span>
+            </div>
+            <strong>1985–2024</strong>
+            <span class="category">Série Histórica</span>
+            <h3>Cobertura e Uso do Solo no Brasil</h3>
+            <p>O monitoramento sistemático revela perda constante de vegetação protetora e expansão urbana desordenada no entorno industrial.</p>
+            <a href="https://brasil.mapbiomas.org/colecoes-mapbiomas/" target="_blank" rel="noopener" class="link-fonte-esg">
+              Fonte: MapBiomas &rarr;
+            </a>
+          </article>
+
+          <article class="stat-card-dores">
+            <div class="top">
+              <span class="badge-esg">Dado oficial</span>
+              <span style="font-size: 16px;">💨</span>
+            </div>
+            <strong>SEEG</strong>
+            <span class="category">Emissões Climáticas</span>
+            <h3>Estimativas de Gases Estufa Industriais</h3>
+            <p>A queima de combustíveis fósseis e processos industriais impõem riscos ambientais diretos sobre a saúde das comunidades vizinhas.</p>
+            <a href="https://seeg.eco.br/" target="_blank" rel="noopener" class="link-fonte-esg">
+              Fonte: SEEG Brasil &rarr;
+            </a>
+          </article>
+
+        </div>
+
+        <!-- Seção de Casos Documentados de Racismo Ambiental -->
+        <div class="casos-reais-secao">
+          <div class="casos-reais-intro">
+            <span class="badge-esg badge-esg-alerta">Casos documentados</span>
+            <h2 style="font-size: 24px; font-weight: 900; color: var(--green-dark); margin-top: 8px;">
+              Casos reais que revelam a urgência da escuta
+            </h2>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 6px;">
+              Enquanto os dados estatísticos mostram o panorama nacional, estes dossiês evidenciam o impacto humano real.
+            </p>
+          </div>
+
+          <div class="casos-reais-grid">
+            
+            <!-- Caso 1: Piquiá de Baixo -->
+            <article class="case-card animate-fade-in">
+              <div class="case-card-img-wrapper">
+                <div class="case-card-gradient"></div>
+                <div class="case-card-badge-pos">
+                  <span class="badge-esg badge-esg-alerta">Caso documentado</span>
+                </div>
+                <span class="case-card-loc">Açailândia, Maranhão</span>
+              </div>
+              <div class="case-card-body">
+                <h3>Piquiá de Baixo: poluição industrial</h3>
+                <p>Comunidade espremida entre plantas siderúrgicas e ramais de mineração sofre há décadas com precipitação de particulados de ferro e poeiras tóxicas.</p>
+                
+                <div class="case-card-impact-sub">
+                  <strong>Impacto humano</strong>
+                  <p>Inviabilização das rotinas domésticas, problemas pulmonares severos e longos anos de espera judicial por reassentamentos seguros fora da pluma de poluição.</p>
+                </div>
+
+                <a href="https://mapadeconflitos.ensp.fiocruz.br/conflito/ma-industria-guseira-contaminacao-da-agua-falta-de-seguranca-e-condicoes-improprias-a-vida-e-a-saude-dos-moradores-do-distrito-industrial-de-pequia-acailandia/" target="_blank" rel="noopener" class="link-fonte-esg">
+                  Fonte: Mapa de Conflitos Fiocruz &rarr;
+                </a>
+              </div>
+            </article>
+
+            <!-- Caso 2: Ilha de Maré -->
+            <article class="case-card animate-fade-in" style="animation-delay: 0.1s;">
+              <div class="case-card-img-wrapper">
+                <div class="case-card-gradient"></div>
+                <div class="case-card-badge-pos">
+                  <span class="badge-esg badge-esg-alerta">Caso documentado</span>
+                </div>
+                <span class="case-card-loc">Salvador, Bahia</span>
+              </div>
+              <div class="case-card-body">
+                <h3>Ilha de Maré: contaminação na pesca</h3>
+                <p>Comunidades pesqueiras e quilombolas lutam contra a contaminação hídrica pesada gerada pelo complexo portuário e refinarias do entorno da Baía.</p>
+                
+                <div class="case-card-impact-sub">
+                  <strong>Impacto humano</strong>
+                  <p>Metais pesados no leito pesqueiro comprometem a subsistência artesanal marisqueira, intoxicando a segurança alimentar e gerando surtos de doenças crônicas.</p>
+                </div>
+
+                <a href="https://monitoramentodh.org.br/casos-acompanhados/caso-ilha-de-mare-ba/" target="_blank" rel="noopener" class="link-fonte-esg">
+                  Fonte: MonitoramentoDH / Mongabay &rarr;
+                </a>
+              </div>
+            </article>
+
+            <!-- Caso 3: Maceió Braskem -->
+            <article class="case-card animate-fade-in" style="animation-delay: 0.2s;">
+              <div class="case-card-img-wrapper">
+                <div class="case-card-gradient"></div>
+                <div class="case-card-badge-pos">
+                  <span class="badge-esg badge-esg-alerta">Caso documentado</span>
+                </div>
+                <span class="case-card-loc">Maceió, Alagoas</span>
+              </div>
+              <div class="case-card-body">
+                <h3>Maceió: subsidência e perda de lar</h3>
+                <p>A extração profunda de sal-gema causou colapso geomecânico urbano, forçando a desocupação imediata de cinco bairros residenciais populosos.</p>
+                
+                <div class="case-card-impact-sub">
+                  <strong>Impacto humano</strong>
+                  <p>Remoção forçada de mais de 50 mil moradores, provocando a perda completa de lares, redes comerciais, memórias afetivas e pertences históricos.</p>
+                </div>
+
+                <a href="https://agenciabrasil.ebc.com.br/geral/noticia/2023-12/dramas-humanos-se-acumulam-em-tragedia-da-braskem-em-maceio" target="_blank" rel="noopener" class="link-fonte-esg">
+                  Fonte: Agência Brasil / Reuters &rarr;
+                </a>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           ABA 2: RELATOS DEMONSTRATIVOS (Oculta por padrão)
+           ========================================== -->
+      <div id="panel-relatos" role="tabpanel" aria-labelledby="tab-btn-relatos" class="animate-fade-in" style="display: none;">
+        
+        <div class="relatos-demo-tab-layout">
+          
+          <!-- Coluna Esquerda: Listagem de Reclamações -->
+          <div class="relatos-list-column" id="relatos-list-container">
+            <!-- Os relatos são gerados pelo JavaScript no rodapé -->
+          </div>
+
+          <!-- Coluna Direita: Inspetor dinâmico -->
+          <article class="inspector-detalhes-card" id="inspector-detail-panel">
+            <div class="inspector-header">
+              <div class="inspector-user-info">
+                <div class="inspector-avatar" id="inspect-avatar-letter">D</div>
+                <div>
+                  <div class="flex-align-center" style="gap: 6px; display: flex;">
+                    <h3 id="inspect-perfil">Trabalhador da pesca</h3>
+                    <span class="badge-esg badge-esg-alerta" id="inspect-priority">Alta</span>
+                  </div>
+                  <p id="inspect-local">Santa Cruz - RJ</p>
+                </div>
+              </div>
+              <span class="badge-esg badge-esg-soft">Protótipo</span>
+            </div>
+
+            <div class="inspector-sub-card">
+              <strong>Queixa principal</strong>
+              <p id="inspect-queixa" style="font-style: italic;">"Poeira industrial recorrente..."</p>
+            </div>
+
+            <div class="inspector-sub-card">
+              <strong>Simulação do relato</strong>
+              <p id="inspect-resumo" style="color: var(--text-secondary);">Detalhamento do relato demonstrativo do protótipo...</p>
+            </div>
+
+            <div class="inspector-grid-impacts">
+              <div class="inspector-impact-item">
+                <span class="icon">💔</span>
+                <h4>Impacto percebido</h4>
+                <p id="inspect-impacto">Irritação respiratória...</p>
+              </div>
+              <div class="inspector-impact-item">
+                <span class="icon">👥</span>
+                <h4>Cotidiano afetado</h4>
+                <p id="inspect-cotidiano">Janelas fechadas...</p>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           ABA 3: FONTES E EVIDÊNCIAS (Oculta por padrão)
+           ========================================== -->
+      <div id="panel-evidencias" role="tabpanel" aria-labelledby="tab-btn-evidencias" class="animate-fade-in" style="display: none;">
+        
+        <div class="casos-reais-secao">
+          <div class="casos-reais-intro">
+            <span class="badge-esg">Fontes públicas</span>
+            <h2 style="font-size: 24px; font-weight: 900; color: var(--green-dark); margin-top: 8px;">
+              Fontes oficiais para subsidiar o controle territorial
+            </h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">
+              Bases públicas governamentais e científicas que alimentam a inteligência socioambiental.
+            </p>
+          </div>
+
+          <div class="stats-grid-dores" style="grid-template-cols: 1fr 1fr; gap: 24px;">
+            
+            <article class="stat-card-dores" style="min-height: 200px;">
+              <div class="top">
+                <span class="badge-esg">Base de dados</span>
+                <span>🌫️</span>
+              </div>
+              <h3 style="font-size: 16px;">MonitorAr - Monitoramento da Qualidade do Ar</h3>
+              <p>Base federal do Ministério do Meio Ambiente que consolida a medição de particulados PM10, PM2.5, SO2, NO2 enviada pelas estações estaduais brasileiras.</p>
+              <a href="https://www.gov.br/mma/pt-br/assuntos/meio-ambiente-urbano-recursos-hidricos-qualidade-ambiental/qualidade-do-ar" target="_blank" rel="noopener" class="link-fonte-esg">
+                Acessar base MonitorAr &rarr;
+              </a>
+            </article>
+
+            <article class="stat-card-dores" style="min-height: 200px;">
+              <div class="top">
+                <span class="badge-esg">Índice indicativo</span>
+                <span>📱</span>
+              </div>
+              <h3 style="font-size: 16px;">Serviço Federal IQAr</h3>
+              <p>Serviço digital federal que calcula o Índice de Qualidade do Ar diário de acordo com limites regulatórios de exposição em zonas urbanas.</p>
+              <a href="https://www.gov.br/pt-br/servicos/obter-dados-das-estacoes-de-monitoramento-da-qualidade-do-ar-por-meio-do-indice-de-qualidade-do-ar-iqar-por-meio-do-aplicativo-monitorar" target="_blank" rel="noopener" class="link-fonte-esg">
+                Acessar painel IQAr &rarr;
+              </a>
+            </article>
+
+            <article class="stat-card-dores" style="min-height: 200px;">
+              <div class="top">
+                <span class="badge-esg">Dados abertos</span>
+                <span>📂</span>
+              </div>
+              <h3 style="font-size: 16px;">Portal de Dados Abertos do MMA</h3>
+              <p>Reúne arquivos geoespaciais e tabulares oficiais sobre licenciamentos, áreas de controle, bacias hidrográficas e inventários de emissões.</p>
+              <a href="https://dados.mma.gov.br/" target="_blank" rel="noopener" class="link-fonte-esg">
+                Acessar Portal MMA &rarr;
+              </a>
+            </article>
+
+            <article class="stat-card-dores" style="min-height: 200px;">
+              <div class="top">
+                <span class="badge-esg">Geo-mapeamento</span>
+                <span>🛰️</span>
+              </div>
+              <h3 style="font-size: 16px;">MapBiomas Brasil</h3>
+              <p>Iniciativa multi-institucional que mapeia anualmente a cobertura e uso da terra, sendo crucial para correlacionar perda de áreas verdes e ilhas de calor.</p>
+              <a href="https://brasil.mapbiomas.org/" target="_blank" rel="noopener" class="link-fonte-esg">
+                Acessar MapBiomas &rarr;
+              </a>
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
+  <!-- Lógica de manipulação de telas, abas e eventos do Diagnóstico -->
+  <script>
+    // Dados demonstrativos locais simulando relatos comunitários
+    const relatosDemo = [
+      {
+        id: 'demo-ar-1',
+        perfil: 'Moradora do território, 64 anos',
+        local: 'Santa Cruz - RJ',
+        categoria: 'Ar',
+        queixa: 'Poeira industrial recorrente sobre quintais e roupas',
+        resumo: 'Exemplo de relato representativo da plataforma sobre a presença frequente de pó prateado de minério, causando incômodos nas vias respiratórias e dificultando a secagem de tecidos em áreas externas.',
+        impacto: 'Irritação de mucosas nasais e redução severa do tempo de lazer externo da família.',
+        cotidiano: 'Necessidade de manter portas e janelas completamente fechadas e higienização dobrada de calçadas.',
+        prioridade: 'Alta'
+      },
+      {
+        id: 'demo-ar-2',
+        perfil: 'Morador do território, 52 anos',
+        local: 'Cubatão - SP',
+        categoria: 'Ar',
+        queixa: 'Odor químico em horários de baixa ventilação',
+        resumo: 'Simulação de queixa de emissões de gases residuais fortes de enxofre e amônia, característicos de refinamento, que se concentram nos limites do perímetro periférico durante as madrugadas.',
+        impacto: 'Crises agudas de dor de cabeça, tosse seca matinal e náuseas periódicas.',
+        cotidiano: 'Dificuldade de sono contínuo nas noites com ventos desfavoráveis vindo da zona fabril.',
+        prioridade: 'Alta'
+      },
+      {
+        id: 'demo-agua-1',
+        perfil: 'Trabalhador da pesca artesanal',
+        local: 'Guarujá - SP',
+        categoria: 'Água',
+        queixa: 'Manchas de óleo e resíduos em canais de manguezais',
+        resumo: 'Simulação demonstrativa de queixa de pesca artesanal que flagra manchas oleosas dispersas por manobras portuárias pesadas, invadindo os canais secundários de reprodução de caranguejos.',
+        impacto: 'Queda drástica de produtividade pesqueira local e risco sanitário alimentar.',
+        cotidiano: 'Dificuldade de atracação limpa das canoas e custos elevados com manutenção de redes manchadas de graxa.',
+        prioridade: 'Média'
+      },
+      {
+        id: 'demo-ruido-1',
+        perfil: 'Moradora do território, 38 anos',
+        local: 'Ipatinga - MG',
+        categoria: 'Ruído',
+        queixa: 'Sopros de purga térmica industrial durante madrugadas',
+        resumo: 'Registro simulado para ilustrar ruídos intermitentes acima dos decibéis permitidos pela NBR 10151 para áreas de zoneamento residencial noturno.',
+        impacto: 'Perturbação do repouso noturno familiar e estresse acusticamente induzido.',
+        cotidiano: 'Dificuldade de concentração laboratorial diurna decorrente da privação recorrente de sono.',
+        prioridade: 'Média'
+      }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Inicializa as Abas
+      initTabs();
+
+      // 2. Preenche a listagem de relatos demonstrativos
+      renderRelatosDemoList();
+
+      // 3. Inicializa o inspetor com o primeiro relato da lista
+      selectRelato(relatosDemo[0].id);
+    });
+
+    /**
+     * Gerencia a ativação das abas de visualização
+     */
+    function initTabs() {
+      const tabButtons = document.querySelectorAll('.btn-tab-dores');
+      
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Desativa botões
+          tabButtons.forEach(b => {
+            b.classList.remove('active');
+            b.classList.add('inactive');
+            b.setAttribute('aria-selected', 'false');
+          });
+
+          // Ativa o botão clicado
+          btn.classList.add('active');
+          btn.classList.remove('inactive');
+          btn.setAttribute('aria-selected', 'true');
+
+          // Oculta todos os painéis
+          document.getElementById('panel-indicadores').style.display = 'none';
+          document.getElementById('panel-relatos').style.display = 'none';
+          document.getElementById('panel-evidencias').style.display = 'none';
+
+          // Exibe o painel correspondente ao botão clicado
+          const controlsId = btn.getAttribute('aria-controls');
+          document.getElementById(controlsId).style.display = 'block';
+        });
+      });
+    }
+
+    /**
+     * Renderiza os botões de relatos demonstrativos na aba correspondente
+     */
+    function renderRelatosDemoList() {
+      const container = document.getElementById('relatos-list-container');
+      if (!container) return;
+
+      container.innerHTML = relatosDemo.map(r => `
+        <button type="button" class="btn-relato-list-item" id="btn-relato-item-${r.id}" onclick="selectRelato('${r.id}')">
+          <div class="item-header">
+            <div>
+              <h3>${r.perfil}</h3>
+              <p class="location">${r.local}</p>
+            </div>
+            <span class="item-cat-badge">${r.categoria}</span>
+          </div>
+          <p class="queixa-quote">“${r.queixa}”</p>
+        </button>
+      `).join('');
+    }
+
+    /**
+     * Atualiza os dados no inspetor lateral de relatos
+     */
+    function selectRelato(id) {
+      const relato = relatosDemo.find(r => r.id === id);
+      if (!relato) return;
+
+      // Altera a classe selecionada na lista lateral
+      document.querySelectorAll('.btn-relato-list-item').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      const selectedBtn = document.getElementById(`btn-relato-item-${id}`);
+      if (selectedBtn) {
+        selectedBtn.classList.add('selected');
+      }
+
+      // Preenche os dados no painel do inspetor
+      document.getElementById('inspect-avatar-letter').textContent = relato.perfil.charAt(0);
+      document.getElementById('inspect-perfil').textContent = relato.perfil;
+      document.getElementById('inspect-local').textContent = relato.local;
+      document.getElementById('inspect-priority').textContent = `Gravidade: ${relato.prioridade}`;
+      document.getElementById('inspect-queixa').textContent = `“${relato.queixa}”`;
+      document.getElementById('inspect-resumo').textContent = relato.resumo;
+      document.getElementById('inspect-impacto').textContent = relato.impacto;
+      document.getElementById('inspect-cotidiano').textContent = relato.cotidiano;
+
+      // Configura a cor do badge de gravidade/prioridade no inspetor
+      const priorityBadge = document.getElementById('inspect-priority');
+      priorityBadge.className = 'badge-esg';
+      if (relato.prioridade === 'Alta') {
+        priorityBadge.classList.add('badge-esg-alerta');
+      } else {
+        priorityBadge.classList.add('badge-esg-soft');
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,48 +1,182 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Natureza Preta</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <script src="assets/script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoVoz - Mapeamento Socioambiental e Ações ESG | Natureza Preta</title>
+  
+  <!-- Estilos e Fontes do Design System -->
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <!-- Dependências de Script da Aplicação (Ordem correta: Banco de dados -> Inicializador Layout -> Acessibilidade) -->
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
 </head>
 <body>
-    <nav class="menu-navegacao">
-        <a href="index.html" class="ativo">CARTAZ</a>
-        <a href="sobre.html">SOBRE</a>
-        <a href="acoes.html">AÇÕES</a>
-    </nav>
 
-    <header>
-        <div class="emoji-grande" role="img"></div>
-        <h1>Água: Nosso Bem Mais Precioso</h1>
-        <p class="subtitulo">Uma campanha da nossa equipe para lembrar que cada gota conta.</p>
-    </header>
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
 
-    <main>
-        <section class="secao-cinza">
-            <div class="container-central">
-                <h2>O que você pode fazer agora</h2>
-                <ul>
-                    <li>✅ Feche bem a torneira quando não estiver usando</li>
-                    <li>✅ Avise quando perceber um vazamento</li>
-                    <li>✅ Reutilize água de limpeza quando der</li>
-                    <li>✅ Use copo ou garrafa reutilizável</li>
-                    <li>✅ Conte para seus colegas sobre essas dicas</li>
-                </ul>
+  <!-- CONTEÚDO PRINCIPAL (pt-compensate previne que o header fixo cubra o conteúdo) -->
+  <main class="pt-compensate">
+    
+    <!-- SEÇÃO HERO (Abertura / Apresentação) -->
+    <section class="hero-secao">
+      <!-- Fundo decorativo em degradê de acordo com as diretrizes do projeto -->
+      <div class="hero-radial-bg"></div>
+
+      <div class="container-limite">
+        <div class="hero-grid">
+          
+          <!-- COLUNA DA ESQUERDA: Textos de chamada e botões de conversão -->
+          <div class="hero-esquerda">
+            <!-- Badge territorial de conformidade -->
+            <div class="badge-esg">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--accent); display: inline-block;"></span>
+              Mapeamento contra o racismo ambiental
             </div>
-        </section>
 
-        <section class="destaque">
-            <h2>Quer saber mais?</h2>
-            <p>Acesse o site da ONU sobre consumo responsável.</p>
-            <a href="https://brasil.un.org/pt-br/sdgs/12" class="botao" target="_blank" rel="noopener">Ver mais sobre Sustentabilidade</a>
-        </section>
-    </main>
-        <footer>
-            <p><strong>Equipe:</strong> Os Guardiões da Água</p>
-            <p>Projeto Integrador • Liga STEAM / ArcelorMittal • 2026</p>
-        </footer>
+            <h1>EcoVoz</h1>
+            <h2>Plataforma socioambiental de escuta, mapeamento e ação comunitária.</h2>
+            <p>
+              A voz da comunidade vira dado. O dado vira ação. Transformamos relatos de moradores em evidências estruturadas para mitigar riscos, sugerir soluções e apoiar a priorização de investimentos socioambientais e compromissos ESG em territórios vulnerabilizados.
+            </p>
+
+            <div class="btn-grupo-hero">
+              <!-- Botão principal de ação: Envia para o formulário de cadastro de queixas -->
+              <a href="relatar.html" class="btn-hero-relatar">Relatar ocorrência</a>
+              <!-- Botão secundário: Envia para a cartografia participativa -->
+              <a href="mapa.html" class="btn-hero-mapa">
+                <span>Ver mapa de impacto</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- COLUNA DA DIREITA: Simulação visual de monitoramento em tempo real -->
+          <div class="hero-direita">
+            <div class="hero-direita-card">
+              
+              <!-- Cabeçalho do Card Simulador -->
+              <div class="card-header-sim">
+                <div class="card-header-title">Painel Territorial de Monitoramento</div>
+                <span class="card-header-badge">Dados Integrados</span>
+              </div>
+
+              <!-- Área do fluxo de simulação -->
+              <div class="sim-flow-row">
+                <!-- Mini-mapa simulado com coordenadas ativas -->
+                <div class="mini-map-sim">
+                  <div class="map-grid-dots"></div>
+                  <!-- Pontos vermelhos e verdes simulando relatos ativos -->
+                  <div class="map-pin-1"></div>
+                  <div class="map-pin-2"></div>
+                  
+                  <span class="label-top">Território Sob Escuta</span>
+                  
+                  <div class="label-bottom">
+                    <span>Mapeamento Crítico</span>
+                    <span style="color: var(--accent); font-weight: 800;">Ativo</span>
+                  </div>
+                </div>
+
+                <!-- Lista de status de andamento dos relatos -->
+                <div class="sim-status-list">
+                  <span class="status-label-heading">Status de Relatos</span>
+                  
+                  <div class="status-sim-card">
+                    <span class="indicator">🚰 Novo</span>
+                    <span class="tag-status tag-status-env">Enviado</span>
+                  </div>
+                  
+                  <div class="status-sim-card">
+                    <span class="indicator">💨 Análise</span>
+                    <span class="tag-status tag-status-tec">Técnica</span>
+                  </div>
+                  
+                  <div class="status-sim-card">
+                    <span class="indicator">🌳 Resolvido</span>
+                    <span class="tag-status tag-status-res">Comitê</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Três pequenos cartões de rodapé ilustrando a metodologia -->
+              <div class="sim-bottom-row">
+                <div class="sim-bottom-card">Escuta Ativa</div>
+                <div class="sim-bottom-card">Mapa Local</div>
+                <div class="sim-bottom-card">Resolução</div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO DE METODOLOGIA (Ações de Monitoramento Territorial) -->
+    <section class="metodologia-secao">
+      <div class="container-limite">
+        
+        <!-- Textos de introdução da metodologia -->
+        <div class="metodologia-intro">
+          <span class="badge-esg" style="margin: 0 auto;">Metodologia e Impacto Social</span>
+          <h3>Ações de Monitoramento Territorial</h3>
+          <p>Conectando vozes, sistematizando dados e construindo soluções de mitigação contra assimetrias ambientais históricas.</p>
+        </div>
+
+        <!-- Grid de 3 Cartões de Metodologia -->
+        <div class="metodologia-grid">
+          
+          <!-- Card 1: Escuta da Comunidade -->
+          <div class="metodologia-card" onclick="location.href='relatar.html'">
+            <div class="metodologia-card-top">
+              <div class="metodologia-card-icon">💬</div>
+              <h4>Escuta da comunidade</h4>
+              <p>Moradores e colaboradores registram problemas com descrição detalhada, fotos e gravidade estimada.</p>
+            </div>
+            <a href="relatar.html" class="metodologia-card-link">Registrar ocorrência &rarr;</a>
+          </div>
+
+          <!-- Card 2: Mapa de Ocorrências -->
+          <div class="metodologia-card" onclick="location.href='mapa.html'">
+            <div class="metodologia-card-top">
+              <div class="metodologia-card-icon">📍</div>
+              <h4>Mapa de ocorrências</h4>
+              <p>Relatos organizados geograficamente por território, categoria de poluição e nível de prioridade.</p>
+            </div>
+            <a href="mapa.html" class="metodologia-card-link">Explorar ocorrências &rarr;</a>
+          </div>
+
+          <!-- Card 3: Resposta Orientada por Dados -->
+          <div class="metodologia-card" onclick="location.href='dashboard.html'">
+            <div class="metodologia-card-top">
+              <div class="metodologia-card-icon">📊</div>
+              <h4>Resposta orientada por dados</h4>
+              <p>Indicadores estatísticos ajudam a planejar soluções estruturadas e acompanhar a resolutividade.</p>
+            </div>
+            <a href="dashboard.html" class="metodologia-card-link">Análise de Indicadores &rarr;</a>
+          </div>
+
+        </div>
+
+        <!-- Banner Call-to-Action (CTA) inferior para o Banco de Soluções -->
+        <div class="cta-banco-home animate-fade-in">
+          <div>
+            <h4>Soluções e valor para stakeholders</h4>
+            <p>Veja o banco de ideias sustentáveis, os pilares do projeto e simulações de economia de metais e mitigação de risco ESG.</p>
+          </div>
+          <a href="solucoes.html" class="btn-cta-banco">Ver Soluções</a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
 </body>
 </html>

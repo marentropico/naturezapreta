@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banco de Soluções Socioambientais e Calculadoras ESG | EcoVoz</title>
+  
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
+
+  <main class="pt-compensate">
+    <div class="container-limite">
+      
+      <!-- Cabeçalho Principal -->
+      <section class="text-left" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <span class="badge-esg">Soluções aplicáveis • Valor ESG</span>
+          <h2 style="font-size: 32px; font-weight: 900; color: var(--green-dark); margin-top: 8px;">
+            Banco de Soluções Socioambientais
+          </h2>
+          <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 6px;">
+            Catálogo de mitigação e prevenção territorial, conectando as queixas da comunidade a compromissos de governança corporativa.
+          </p>
+        </div>
+        
+        <!-- Campo de Pesquisa Rápida -->
+        <div class="password-input-wrapper" style="max-width: 300px;">
+          <input type="text" id="search-sol-input" placeholder="Pesquisar soluções..." style="padding: 10px 16px 10px 36px; border-radius: var(--radius-sm); border: 1px solid var(--green-light); font-size: 13px;">
+          <span style="position: absolute; left: 12px; top: 52%; transform: translateY(-50%); font-size: 13px;">🔍</span>
+        </div>
+      </section>
+
+      <!-- DUAL CALCULATORS (Calculadoras Corporativas ESG) -->
+      <section class="dual-calc-container">
+        
+        <!-- CALCULADORA 1: CUSTO DA INAÇÃO -->
+        <article class="calc-card-esg animate-fade-in">
+          <span class="badge-esg" style="background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.25); color: var(--accent);">
+            💵 Simulação de Custo de Inação
+          </span>
+          <h3>Calculadora de Risco Evitado</h3>
+          <p class="desc">
+            Simula quanto de exposição financeira (jurídico, vistorias de emergência e multas CONAMA) é mitigada ao responder relatos comunitários com rapidez.
+          </p>
+          
+          <div class="calc-inputs-list">
+            <!-- Input 1 -->
+            <div class="calc-input-group">
+              <label for="calc-ina-relatos">Relatos críticos por mês</label>
+              <input type="number" id="calc-ina-relatos" min="0" value="18">
+              <span class="helper-text">Queixas com potencial de gerar conflitos ou multas na região.</span>
+            </div>
+            <!-- Input 2 -->
+            <div class="calc-input-group">
+              <label for="calc-ina-custo">Custo médio de resposta tardia (R$)</label>
+              <input type="number" id="calc-ina-custo" min="0" value="8500">
+              <span class="helper-text">Deslocamento técnico, vistorias de órgãos e penalidades.</span>
+            </div>
+            <!-- Input 3 -->
+            <div class="calc-input-group">
+              <label for="calc-ina-reducao">Redução de risco estimada (%)</label>
+              <input type="number" id="calc-ina-reducao" min="0" max="100" value="25">
+              <span class="helper-text">Estimativa de redução de crises operacionais via ouvidoria ativa.</span>
+            </div>
+          </div>
+
+          <!-- Caixa de Resultado -->
+          <div class="calc-result-box">
+            <span class="title">Risco anual evitado — Estimativa</span>
+            <strong class="value" id="val-calc-ina-resultado">R$ 0,00</strong>
+            <p class="summary" id="val-calc-ina-summary">Exposição mensal antes da mitigação: R$ 0,00. Aplicando a taxa de redução...</p>
+          </div>
+        </article>
+
+        <!-- CALCULADORA 2: ECONOMIA DE METAIS RENOVAIS (Checklist item 5) -->
+        <article class="calc-card-esg calc-green-light animate-fade-in" style="animation-delay: 0.1s;">
+          <span class="badge-esg">
+            ♻️ Renovabilidade de Metais
+          </span>
+          <h3>Economia de Metais e Reciclagem</h3>
+          <p class="desc">
+            Calcula os benefícios ecológicos e socioambientais de utilizar metais de fontes renovadas (sucatas) em siderúrgicas comparado à extração primária de minério.
+          </p>
+
+          <div class="calc-inputs-list">
+            <div class="calc-input-group">
+              <label for="calc-met-toneladas">Peso de sucata metálica processada (Toneladas)</label>
+              <input type="number" id="calc-met-toneladas" min="0" value="1500" style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-main);">
+              <span class="helper-text" style="color: var(--text-secondary);">Mapeia a quantidade de metais renovados e reciclados no ciclo industrial.</span>
+            </div>
+          </div>
+
+          <!-- Caixa de Resultado Metálico -->
+          <div class="calc-result-box" style="display: flex; flex-direction: column; gap: 8px;">
+            <span class="title" style="color: var(--green-medium);">Recursos Preservados do Território</span>
+            <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 10px; margin-top: 6px; font-size: 11px;">
+              <div style="background-color: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <span style="font-weight: 800; color: var(--green-dark);">Energia economizada:</span>
+                <strong id="val-met-energia" style="font-size: 13px; display: block; margin-top: 2px;">0 MWh</strong>
+              </div>
+              <div style="background-color: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <span style="font-weight: 800; color: var(--green-dark);">CO2 não emitido:</span>
+                <strong id="val-met-co2" style="font-size: 13px; display: block; margin-top: 2px;">0 t CO2</strong>
+              </div>
+              <div style="background-color: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <span style="font-weight: 800; color: var(--green-dark);">Água economizada:</span>
+                <strong id="val-met-agua" style="font-size: 13px; display: block; margin-top: 2px;">0 L</strong>
+              </div>
+              <div style="background-color: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <span style="font-weight: 800; color: var(--accent-dark);">Minério preservado:</span>
+                <strong id="val-met-minerio" style="font-size: 13px; display: block; margin-top: 2px;">0 t Minério</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- BARRA DE FILTROS DO BANCO DE SOLUÇÕES -->
+      <section class="metodologia-secao" style="padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); background-color: #FFFFFF; margin-bottom: 24px; text-align: left;">
+        <span class="control-label" style="margin-bottom: 10px; display: block;">Filtros Rápidos e Complexidade</span>
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 20px;">
+          <!-- Categorias -->
+          <div class="form-group">
+            <label>Filtrar por Categoria</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;" id="cat-filter-wrapper">
+              <!-- JS preenche -->
+            </div>
+          </div>
+          <!-- Complexidade -->
+          <div class="form-group">
+            <label>Complexidade Técnica</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;" id="comp-filter-wrapper">
+              <button type="button" class="btn-tab-dores active" data-comp="Todos">Todas</button>
+              <button type="button" class="btn-tab-dores inactive" data-comp="Baixa">Baixa</button>
+              <button type="button" class="btn-tab-dores inactive" data-comp="Média">Média</button>
+              <button type="button" class="btn-tab-dores inactive" data-comp="Alta">Alta</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GRID DO BANCO DE SOLUÇÕES -->
+      <section class="solucoes-grid" id="solucoes-grid-container" style="margin-bottom: 48px;">
+        <!-- Injetado via JS -->
+      </section>
+
+      <!-- SEÇÃO DO FORMULÁRIO DE PROPOSIÇÕES SUSTENTÁVEIS -->
+      <section style="max-width: 800px; margin: 0 auto;">
+        
+        <div class="text-center" style="margin-bottom: 32px;">
+          <span class="badge-esg">Inovação e Coparticipação</span>
+          <h2 style="font-size: 30px; font-weight: 900; color: var(--green-dark); margin-top: 8px;">
+            Propor Solução Sustentável
+          </h2>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">
+            Estudantes, pesquisadores e moradores podem submeter ideias técnicas. Nossa equipe avalia a viabilidade juntamente com a comunidade.
+          </p>
+        </div>
+
+        <div class="metodologia-secao animate-scale-up" style="background-color: #FFFFFF; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-md); text-align: left;">
+          
+          <!-- Sucesso da proposição -->
+          <div id="success-prop-box" class="success-box" style="display: none;">
+            <span>✔️</span>
+            <h4>Proposta cadastrada com sucesso!</h4>
+            <p>
+              Sua contribuição técnica foi arquivada. Ela será avaliada pelo comitê de governança socioambiental e exibida no Banco de Soluções.
+            </p>
+            <button type="button" id="btn-success-prop-reset" class="btn-submit-form" style="max-width: 240px; margin: 20px auto 0;">
+              Propor outra solução
+            </button>
+          </div>
+
+          <!-- Formulário de Soluções -->
+          <form id="form-proposta-esg" class="modal-form">
+            <div class="proposta-valor-card" style="margin-top: 0; background-color: var(--bg-primary); padding: 16px;">
+              <div style="font-size: 18px;">💡</div>
+              <p style="font-size: 12px; margin-top: 0;">
+                <strong>Ideias geram transformação:</strong> Formule propostas práticas de barreiras verdes, monitoramento ou mitigação de resíduos.
+              </p>
+            </div>
+
+            <div id="error-box-proposta" class="error-box" style="display: none;"></div>
+
+            <div class="sim-flow-row" style="grid-template-cols: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label for="prop-title">Nome da Proposta / Título Curto *</label>
+                <input type="text" id="prop-title" required placeholder="Ex: Cinturão de Arborização Perimetral">
+              </div>
+              <div class="form-group">
+                <label for="prop-autor">Autor, Grupo ou Instituição *</label>
+                <input type="text" id="prop-autor" required placeholder="Ex: Unifesp / Coletivo EcoCarioca">
+              </div>
+            </div>
+
+            <div class="sim-flow-row" style="grid-template-cols: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label for="prop-target">Queixa ou problema do mapa que resolve *</label>
+                <input type="text" id="prop-target" required placeholder="Ex: Poeira e ruídos na divisa de Jesuítas">
+              </div>
+              <div class="form-group">
+                <label for="prop-categoria">Categoria de Enquadramento *</label>
+                <select id="prop-categoria" required>
+                  <option value="Barreiras verdes">Barreiras verdes</option>
+                  <option value="Monitoramento ambiental">Monitoramento ambiental</option>
+                  <option value="Educação ambiental">Educação ambiental</option>
+                  <option value="Economia circular">Economia circular</option>
+                  <option value="Eficiência energética">Eficiência energética</option>
+                  <option value="Mobilidade sustentável">Mobilidade sustentável</option>
+                  <option value="Drenagem urbana">Drenagem urbana</option>
+                  <option value="Gestão de resíduos">Gestão de resíduos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sim-bottom-row" style="margin-top: 0; grid-template-cols: 5fr 2fr 5fr; gap: 12px; border-top: none; padding-top: 0;">
+              <!-- Custo -->
+              <div class="form-group">
+                <label>Custo Estimado *</label>
+                <select id="prop-custo" required>
+                  <option value="Baixo">Baixo</option>
+                  <option value="Médio" selected>Médio</option>
+                  <option value="Alto">Alto</option>
+                </select>
+              </div>
+              <!-- Prazo -->
+              <div class="form-group">
+                <label for="prop-prazo">Prazo *</label>
+                <select id="prop-prazo" required>
+                  <option value="3 meses">3 meses</option>
+                  <option value="6 meses" selected>6 meses</option>
+                  <option value="12 meses">12 meses</option>
+                </select>
+              </div>
+              <!-- Viabilidade -->
+              <div class="form-group">
+                <label>Viabilidade Técnica *</label>
+                <select id="prop-viabilidade" required>
+                  <option value="Alta" selected>Alta</option>
+                  <option value="Média">Média</option>
+                  <option value="Baixa">Baixa</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="prop-descricao">Descrição Técnica / Como funciona a solução? *</label>
+              <textarea id="prop-descricao" rows="4" required placeholder="Descreva o escopo da ação sustentável, materiais necessários e funcionamento..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="prop-impacto">Impacto Socioambiental Esperado *</label>
+              <textarea id="prop-impacto" rows="2" required placeholder="Ex: Redução de 40% na dispersão de pó por arraste do vento e regulação térmica do bairro..."></textarea>
+            </div>
+
+            <div class="form-group lgpd-group">
+              <input type="checkbox" id="prop-lgpd-checkbox" required>
+              <label for="prop-lgpd-checkbox" style="text-transform: none; font-weight: 400; color: var(--text-secondary);">
+                <strong>Consentimento LGPD:</strong> Concordo que meus dados e o escopo da proposta sejam salvos e tratados de acordo com a LGPD (Lei 13.709/18) com a finalidade exclusiva de avaliação de viabilidade e divulgação no Banco de Soluções.
+              </label>
+            </div>
+
+            <button type="submit" class="btn-submit-form" style="margin-top: 12px;">
+              🚀 Submeter Proposta à Avaliação
+            </button>
+          </form>
+
+        </div>
+      </section>
+
+      <!-- DYNAMIC DETAIL MODAL OVERLAY (Solução expandida) -->
+      <div class="modal-overlay" id="sol-detail-modal-overlay">
+        <div class="modal-card animate-scale-up" style="max-width: 580px;" role="dialog" aria-modal="true" aria-labelledby="modal-sol-title">
+          <button type="button" class="modal-close-btn" id="btn-close-sol-modal">&times;</button>
+          
+          <div class="modal-content-wrapper text-left" id="modal-sol-content-target">
+            <!-- JS preenche -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
+  <!-- Lógica das calculadoras, banco de dados local e catalogação de soluções -->
+  <script>
+    // Catálogo fixo de soluções oficiais
+    const dbSolutionsFixas = [
+      { id: 'sol-real-1', title: 'Cinturões Verdes de Amortecimento Industrial (Silt Belts)', problem: 'Dispersão de material particulado de minério e ferro metálico.', description: 'Implantação de barreiras físicas e biológicas ativas baseadas em estratos arbustivos densos (Ipês, Clúsias, Pitangueiras) plantados ortogonalmente à direção preferencial do vento de dispersão para sedimentar o pó suspenso.', expectedImpact: 'Estudos ambientais indicam potencial de filtragem física de material particulado com espécies de copa média.', complexity: 'Média', category: 'Barreiras verdes', sourceName: 'MMA - MonitorAr e Boas Práticas', sourceUrl: 'https://www.gov.br/mma/pt-br/assuntos/meio-ambiente-urbano-recursos-hidricos-qualidade-ambiental/qualidade-do-ar', label: 'Dado oficial' },
+      { id: 'sol-real-2', title: 'Sistemas de Aspersão de Microgotas e Umectação Contínua', problem: 'Emissão difusa de poeira e cinzas de carvão (coque e escória).', description: 'Bicos atomizadores instalados em pilhas e áreas de movimentação que emitem névoa ultrafina de água com polímeros biodegradáveis aglomerantes, coibindo a ação eólica de arraste.', expectedImpact: 'Prevenção de arraste aéreo de poeira em áreas abertas nos parques de estocagem mineral.', complexity: 'Alta', category: 'Monitoramento ambiental', sourceName: 'Portal de Dados Abertos MMA (Padrões Tecnológicos)', sourceUrl: 'https://dados.mma.gov.br/', label: 'Dado oficial' },
+      { id: 'sol-real-3', title: 'Jardins de Chuva e Sistemas Fitodepuradores Pluviais', problem: 'Escoamento superficial poluído de óleos, graxas e metais pesados.', description: 'Zonas baixas de captação providas de substrato poroso e espécies macrofitas filtrantes que retêm resíduos industriais, óleos da rodovia e metais em suspensão antes do retorno ao leito do estuário de pesca.', expectedImpact: 'Biorretenção e decantação de contaminantes solúveis por filtragem de substratos e plantas fitoremediadoras.', complexity: 'Baixa', category: 'Drenagem urbana', sourceName: 'MapBiomas Brasil (Infraestrutura Verde)', sourceUrl: 'https://brasil.mapbiomas.org/', label: 'Dado oficial' },
+      { id: 'sol-real-4', title: 'Rede Local Popular de Micro-Sensores Abertos de Particulados', problem: 'Falta de dados e assimetria informativa para a comunidade.', description: 'Micro-scrapers IoT de baixo custo espalhados pelas varandas de residências vulneráveis, coletando leituras constantes e alimentando painéis da sociedade civil para monitorar alertas.', expectedImpact: 'Capacitação comunitária para detecção indicativa de ar através de sensores de fita óptica ou PM2.5 de canal aberto.', complexity: 'Média', category: 'Monitoramento ambiental', sourceName: 'MMA - MonitorAr (Ações Coletivas)', sourceUrl: 'https://www.gov.br/pt-br/servicos/obter-dados-das-estacoes-de-monitoramento-da-qualidade-do-ar-por-meio-do-indice-de-qualidade-do-ar-iqar-por-meio-do-aplicativo-monitorar', label: 'Dado oficial' }
+    ];
+
+    let filterCategory = 'Todos';
+    let filterComplexity = 'Todos';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Liga os eventos das calculadoras
+      initCalculators();
+
+      // 2. Monta filtros e catálogo de soluções
+      renderFiltersAndSolutions();
+
+      // 3. Assina o formulário de proposições
+      initProposalForm();
+
+      // Fechar modal de detalhes
+      document.getElementById('btn-close-sol-modal').onclick = () => {
+        document.getElementById('sol-detail-modal-overlay').classList.remove('modal-visible');
+      };
+    });
+
+    /**
+     * Liga os listeners nas duas calculadoras para cômputos automáticos
+     */
+    function initCalculators() {
+      // Calculadora 1: Custo da inação
+      const inpRelatos = document.getElementById('calc-ina-relatos');
+      const inpCusto = document.getElementById('calc-ina-custo');
+      const inpReducao = document.getElementById('calc-ina-reducao');
+
+      const recalculateIna = () => {
+        const relatosVal = Number(inpRelatos.value) || 0;
+        const custoVal = Number(inpCusto.value) || 0;
+        const reducaoVal = Number(inpReducao.value) || 0;
+
+        const monthlyExp = relatosVal * custoVal;
+        const annualRisk = relatosVal * custoVal * 12 * (reducaoVal / 100);
+
+        document.getElementById('val-calc-ina-resultado').textContent = annualRisk.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+        document.getElementById('val-calc-ina-summary').textContent = `Exposição mensal antes da mitigação: ${monthlyExp.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}. Aplicando a taxa de ${reducaoVal}% de redução em 12 meses, evitamos o risco indicado.`;
+      };
+
+      inpRelatos.addEventListener('input', recalculateIna);
+      inpCusto.addEventListener('input', recalculateIna);
+      inpReducao.addEventListener('input', recalculateIna);
+      
+      // Computa valor inicial
+      recalculateIna();
+
+      // Calculadora 2: Economia de Metais
+      const inpMet = document.getElementById('calc-met-toneladas');
+
+      const recalculateMet = () => {
+        const tons = Number(inpMet.value) || 0;
+
+        const energia = (tons * 1.4).toFixed(0);
+        const co2 = (tons * 1.5).toFixed(0);
+        const agua = (tons * 18).toFixed(0);
+        const minerio = (tons * 1.1).toFixed(0);
+
+        document.getElementById('val-met-energia').textContent = `${Number(energia).toLocaleString('pt-BR')} MWh`;
+        document.getElementById('val-met-co2').textContent = `${Number(co2).toLocaleString('pt-BR')} t CO2`;
+        document.getElementById('val-met-agua').textContent = `${Number(agua).toLocaleString('pt-BR')} mil L`;
+        document.getElementById('val-met-minerio').textContent = `${Number(minerio).toLocaleString('pt-BR')} t Minério`;
+      };
+
+      inpMet.addEventListener('input', recalculateMet);
+      
+      // Computa valor inicial
+      recalculateMet();
+    }
+
+    /**
+     * Consolida e renderiza os filtros rápidos de categorias e soluções
+     */
+    function renderFiltersAndSolutions() {
+      // Busca propostas submetidas do localStorage via AppDB
+      const customPropostas = window.AppDB ? window.AppDB.getPropostas() : [];
+      
+      // Mapeia propostas customizadas para o layout de soluções
+      const mappedCustom = customPropostas.map(p => ({
+        id: p.id,
+        title: p.titulo,
+        problem: p.problemaRelacionado,
+        description: p.descricao,
+        expectedImpact: p.impacto,
+        complexity: p.viabilidade === 'Alta' ? 'Baixa' : p.viabilidade === 'Média' ? 'Média' : 'Alta',
+        category: p.categoria || 'Gerais',
+        sourceName: 'Proposta Comunitária',
+        sourceUrl: '#',
+        label: 'Proposta comunitária'
+      }));
+
+      // Combina a lista estática e a dinâmica
+      const todasSolucoes = [...dbSolutionsFixas, ...mappedCustom];
+
+      // A. Preenche dinamicamente o menu de categorias
+      const catWrapper = document.getElementById('cat-filter-wrapper');
+      const setCats = new Set();
+      setCats.add('Todos');
+      todasSolucoes.forEach(s => setCats.add(s.category));
+
+      let catBtnsHTML = '';
+      setCats.forEach(cat => {
+        const isActive = filterCategory === cat;
+        catBtnsHTML += `
+          <button type="button" class="btn-tab-dores ${isActive ? 'active' : 'inactive'}" data-cat="${cat}">${cat}</button>
+        `;
+      });
+      catWrapper.innerHTML = catBtnsHTML;
+
+      // Assina cliques de categoria
+      document.querySelectorAll('#cat-filter-wrapper button').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('#cat-filter-wrapper button').forEach(b => { b.className = 'btn-tab-dores inactive'; });
+          btn.className = 'btn-tab-dores active';
+          filterCategory = btn.getAttribute('data-cat');
+          applyFilters(todasSolucoes);
+        };
+      });
+
+      // B. Assina cliques de complexidade
+      const compBtns = document.querySelectorAll('#comp-filter-wrapper button');
+      compBtns.forEach(btn => {
+        btn.onclick = () => {
+          compBtns.forEach(b => { b.className = 'btn-tab-dores inactive'; });
+          btn.className = 'btn-tab-dores active';
+          filterComplexity = btn.getAttribute('data-comp');
+          applyFilters(todasSolucoes);
+        };
+      });
+
+      // C. Assina pesquisa textual
+      document.getElementById('search-sol-input').oninput = () => {
+        applyFilters(todasSolucoes);
+      };
+
+      // Inicializa exibição
+      applyFilters(todasSolucoes);
+    }
+
+    /**
+     * Aplica filtros e renderiza o catálogo
+     */
+    function applyFilters(solutionsList) {
+      const search = document.getElementById('search-sol-input').value.toLowerCase().trim();
+      const container = document.getElementById('solucoes-grid-container');
+
+      const filtradas = solutionsList.filter(s => {
+        const matchesCat = filterCategory === 'Todos' || s.category === filterCategory;
+        const matchesComp = filterComplexity === 'Todos' || s.complexity === filterComplexity;
+        const matchesSearch = !search || 
+          s.title.toLowerCase().includes(search) || 
+          s.problem.toLowerCase().includes(search) || 
+          s.description.toLowerCase().includes(search);
+
+        return matchesCat && matchesComp && matchesSearch;
+      });
+
+      if (filtradas.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: span 3; text-align: center; color: var(--text-secondary); padding: 48px;">
+            ⚠️ Nenhuma solução correspondente localizada na base de dados.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtradas.map(s => {
+        const rate = s.category.includes('verde') ? 45 : s.category.includes('aspers') ? 90 : s.category.includes('ar') ? 85 : 55;
+        const color = s.category.includes('verde') ? 'bg-grav-baixa' : s.category.includes('ar') ? 'bg-grav-media' : 'bg-grav-alta';
+        const isOfficial = s.sourceName !== 'Proposta Comunitária';
+
+        return `
+          <div class="sol-card animate-fade-in" style="${isOfficial ? '' : 'border-style: dashed; border-color: #F6C56B; background-color: #FFF8EF;'}">
+            <div class="sol-card-body">
+              <div class="sol-card-header">
+                <div class="sol-card-category-box">
+                  <span class="sol-card-category-name">${s.category}</span>
+                </div>
+                <span class="badge-esg ${isOfficial ? '' : 'badge-esg-alerta'}" style="padding: 2px 8px; font-size: 8px;">
+                  ${s.label || 'Protótipo'}
+                </span>
+              </div>
+              
+              <h3>${s.title}</h3>
+              <p class="problem-focus">Foco: ${s.problem}</p>
+
+              <!-- Métrica visual -->
+              <div class="sol-gauge-box">
+                <div class="sol-gauge-row">
+                  <span>Taxa de Resolução</span>
+                  <span>${rate}%</span>
+                </div>
+                <div class="sol-gauge-bar-bg">
+                  <div class="sol-gauge-bar-fill ${color}" style="width: ${rate}%;"></div>
+                </div>
+              </div>
+
+              <p class="description">${s.description}</p>
+            </div>
+
+            <div class="sol-card-footer">
+              <span class="comp">Complexidade: ${s.complexity}</span>
+              <button type="button" class="btn-sol-detail" onclick="openSolutionDetail('${s.id}')">Detalhes</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Exibe o modal detalhado de uma solução
+     */
+    function openSolutionDetail(id) {
+      // Busca no banco estático + propostas locais
+      const customPropostas = window.AppDB ? window.AppDB.getPropostas() : [];
+      const mappedCustom = customPropostas.map(p => ({
+        id: p.id,
+        title: p.titulo,
+        problem: p.problemaRelacionado,
+        description: p.descricao,
+        expectedImpact: p.impacto,
+        complexity: p.viabilidade === 'Alta' ? 'Baixa' : p.viabilidade === 'Média' ? 'Média' : 'Alta',
+        category: p.categoria || 'Gerais',
+        sourceName: 'Proposta Comunitária',
+        sourceUrl: '#',
+        label: 'Proposta comunitária'
+      }));
+      const todas = [...dbSolutionsFixas, ...mappedCustom];
+
+      const sol = todas.find(s => s.id === id);
+      if (!sol) return;
+
+      const target = document.getElementById('modal-sol-content-target');
+      
+      target.innerHTML = `
+        <div class="modal-header-text" style="text-align: left; margin-bottom: 16px;">
+          <span class="modal-eyebrow">${sol.category} &bull; Complexidade ${sol.complexity}</span>
+          <h3 style="font-size: 20px;">${sol.title}</h3>
+          <p style="color: var(--accent-dark); font-weight: 700; margin-top: 4px;">Problema alvo: ${sol.problem}</p>
+        </div>
+
+        <div class="form-group" style="background-color: var(--bg-primary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 13px; line-height: 1.6;">
+          <strong>Como funciona a solução:</strong>
+          <p style="margin-top: 6px;">${sol.description}</p>
+        </div>
+
+        <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <div style="background-color: var(--green-tint); padding: 12px; border-radius: 8px; font-size: 11.5px;">
+            <strong style="color: var(--green-dark);">Impacto socioambiental</strong>
+            <p style="margin-top: 4px;">${sol.expectedImpact}</p>
+          </div>
+          <div style="background-color: var(--green-tint); padding: 12px; border-radius: 8px; font-size: 11.5px;">
+            <strong style="color: var(--green-dark);">Referência científica</strong>
+            <p style="margin-top: 4px; font-weight: 700;">${sol.sourceName}</p>
+            ${sol.sourceUrl !== '#' ? `<a href="${sol.sourceUrl}" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline; margin-top: 6px; display: inline-block;">Ver base de dados &rarr;</a>` : ''}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('sol-detail-modal-overlay').classList.add('modal-visible');
+    }
+
+    // Exporta para escopo global
+    window.openSolutionDetail = openSolutionDetail;
+
+    /**
+     * Inicializa o formulário de propostas sustentáveis
+     */
+    function initProposalForm() {
+      const form = document.getElementById('form-proposta-esg');
+      const errorBox = document.getElementById('error-box-proposta');
+      const successBox = document.getElementById('success-prop-box');
+
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        errorBox.style.display = 'none';
+
+        const titulo = document.getElementById('prop-title').value;
+        const autor = document.getElementById('prop-autor').value;
+        const problemaRelacionado = document.getElementById('prop-target').value;
+        const categoria = document.getElementById('prop-categoria').value;
+        const custo = document.getElementById('prop-custo').value;
+        const prazo = document.getElementById('prop-prazo').value;
+        const viabilidade = document.getElementById('prop-viabilidade').value;
+        const desc = document.getElementById('prop-descricao').value;
+        const imp = document.getElementById('prop-impacto').value;
+        const lgpd = document.getElementById('prop-lgpd-checkbox').checked;
+
+        if (!lgpd) {
+          errorBox.textContent = 'Você deve aceitar a cláusula LGPD.';
+          errorBox.style.display = 'block';
+          return;
+        }
+
+        if (desc.trim().length < 15) {
+          errorBox.textContent = 'A descrição técnica deve ter pelo menos 15 caracteres.';
+          errorBox.style.display = 'block';
+          return;
+        }
+
+        const activeUser = window.AppDB ? window.AppDB.getActiveUser() : null;
+
+        const novaProposta = {
+          id: 'prop-' + Date.now(),
+          titulo,
+          autor,
+          problemaRelacionado,
+          descricao: desc,
+          categoria,
+          custo,
+          prazo,
+          impacto: imp,
+          viabilidade,
+          status: 'Em Discussão',
+          userEmail: activeUser ? activeUser.email : undefined // Vincula e-mail se logado
+        };
+
+        // Salva localmente via AppDB
+        if (window.AppDB) {
+          window.AppDB.addProposta(novaProposta);
+        }
+
+        // Mostra sucesso
+        form.style.display = 'none';
+        successBox.style.display = 'flex';
+
+        // Recarrega o catálogo para exibir a nova proposta imediatamente
+        renderFiltersAndSolutions();
+      };
+
+      document.getElementById('btn-success-prop-reset').onclick = () => {
+        form.reset();
+        form.style.display = 'flex';
+        successBox.style.display = 'none';
+      };
+    }
+  </script>
+
+</body>
+</html>

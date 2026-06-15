@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel ESG e Evidências Socioambientais | EcoVoz</title>
+  
+  <!-- Estilos e Fontes do Design System -->
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <!-- Dependências de Script da Aplicação -->
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
+  
+  <style>
+    /* Estilos inline para o dashboard e gráficos customizados SVG/CSS */
+    .dashboard-grid {
+      display: grid;
+      grid-template-cols: 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    @media (min-width: 1024px) {
+      .dashboard-grid {
+        grid-template-cols: 1fr 1fr;
+      }
+    }
+    
+    .chart-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      min-height: 420px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .chart-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 16px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    .chart-card-header h3 {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--green-dark);
+      margin-top: 8px;
+      line-height: 1.3;
+    }
+    
+    .chart-card-header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    
+    .chart-icon-top {
+      font-size: 24px;
+      opacity: 0.8;
+    }
+    
+    .chart-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 260px;
+    }
+    
+    .chart-footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 16px;
+      margin-top: 16px;
+      text-align: left;
+    }
+    
+    .chart-source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-medium);
+      text-decoration: none;
+    }
+    
+    .chart-source-link:hover {
+      color: var(--green-dark);
+      text-decoration: underline;
+    }
+    
+    /* Gráficos Customizados SVG */
+    .svg-chart-container {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .bar-rect {
+      transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1), y 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    
+    .bar-rect:hover {
+      opacity: 0.85;
+    }
+    
+    .donut-segment {
+      transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+      cursor: pointer;
+    }
+    
+    .donut-segment:hover {
+      stroke-width: 14;
+    }
+    
+    /* Legenda de cores para gráficos de pizza */
+    .chart-legend-grid {
+      display: grid;
+      grid-template-cols: 1fr;
+      gap: 8px;
+      width: 100%;
+      margin-top: 12px;
+    }
+    
+    @media (min-width: 480px) {
+      .chart-legend-grid {
+        grid-template-cols: 1fr 1fr;
+      }
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-dark);
+      text-align: left;
+    }
+    
+    .legend-color-box {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    /* Tooltip Customizado no HTML */
+    .chart-tooltip-sim {
+      position: absolute;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 11px;
+      color: var(--green-dark);
+      pointer-events: none;
+      box-shadow: var(--shadow-md);
+      display: none;
+      z-index: 10;
+      transform: translate(-50%, -100%);
+      margin-top: -8px;
+    }
+    
+    /* Controles e cartões estatísticos */
+    .metricas-dashboard-row {
+      display: grid;
+      grid-template-cols: 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    
+    @media (min-width: 640px) {
+      .metricas-dashboard-row {
+        grid-template-cols: 1fr 1fr 1fr;
+      }
+    }
+    
+    .metrica-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: left;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .metrica-card .icon {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    
+    .metrica-card strong {
+      display: block;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green-dark);
+      margin-top: 4px;
+    }
+    
+    .metrica-card p.title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    .metrica-card p.desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="pt-compensate">
+    <div class="container-limite">
+      
+      <!-- Banner Geral do Painel -->
+      <section class="sobre-pilares-card" style="padding: 32px; border-radius: var(--radius-lg); text-align: left; background-color: #FFFFFF;">
+        <div style="display: flex; flex-direction: column; lg-flex-direction: row; justify-content: space-between; align-items: start; lg-align-items: end; gap: 24px;">
+          <div style="max-width: 760px;">
+            <span class="badge-esg">Indicadores ESG e socioambientais</span>
+            <h2 style="font-size: 32px; font-weight: 900; color: var(--green-dark); margin-top: 12px; letter-spacing: -0.5px;">
+              Painel de Evidências Socioambientais
+            </h2>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6;">
+              Visualização de indicadores públicos oficiais de vulnerabilidade no Brasil versus o volume e status das ocorrências comunitárias captadas em tempo real pelo protótipo EcoVoz.
+            </p>
+          </div>
+          <div class="pilar-item" style="min-width: 240px; padding: 16px; margin: 0; background-color: var(--bg-primary);">
+            <span style="font-size: 10px; font-weight: 850; text-transform: uppercase; color: var(--text-secondary); tracking: 1px;">Sessão Corporativa</span>
+            <strong id="dashboard-session-user" style="display: block; font-size: 13.5px; color: var(--green-dark); font-weight: 900; margin-top: 4px;">Carregando perfil...</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cartões de Métricas Consolidadas -->
+      <section class="metricas-dashboard-row">
+        <div class="metrica-card">
+          <div class="icon">📁</div>
+          <strong id="count-total-relatos">0</strong>
+          <p class="title">Relatos no Protótipo</p>
+          <p class="desc">Volume total de ocorrências registradas pela comunidade no banco de dados local.</p>
+        </div>
+        
+        <div class="metrica-card">
+          <div class="icon" style="color: var(--accent);">🔥</div>
+          <strong id="count-criticos-relatos" style="color: var(--accent);">0</strong>
+          <p class="title">Prioridade Crítica</p>
+          <p class="desc">Queixas de severidade extrema cadastradas que exigem resposta imediata dos comitês.</p>
+        </div>
+        
+        <div class="metrica-card">
+          <div class="icon">💡</div>
+          <strong id="count-total-propostas">0</strong>
+          <p class="title">Soluções Propostas</p>
+          <p class="desc">Propostas de mitigação socioambiental em andamento ou já implementadas.</p>
+        </div>
+      </section>
+
+      <!-- Grid de Gráficos (2 colunas em telas grandes) -->
+      <section class="dashboard-grid">
+        
+        <!-- Gráfico 1: IBGE Esgotamento por Cor/Raça -->
+        <article class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <span class="badge-esg">Dado Oficial</span>
+              <h3>Acesso a Esgotamento Sanitário Adequado por Cor/Raça (%)</h3>
+              <p>O Censo 2022 constatou desigualdades crônicas na cobertura de esgoto, mostrando desvantagem severa para populações pardas, pretas e indígenas.</p>
+            </div>
+            <span class="chart-icon-top">📊</span>
+          </div>
+          
+          <div class="chart-body">
+            <!-- SVG do Gráfico de Barras Vertical -->
+            <svg class="svg-chart-container" viewBox="0 0 400 240" aria-label="Gráfico de barras mostrando acesso a esgoto por cor ou raça">
+              <!-- Grid Lines -->
+              <line x1="50" y1="30" x2="380" y2="30" stroke="#E6EBE6" stroke-dasharray="3 3" />
+              <line x1="50" y1="70" x2="380" y2="70" stroke="#E6EBE6" stroke-dasharray="3 3" />
+              <line x1="50" y1="110" x2="380" y2="110" stroke="#E6EBE6" stroke-dasharray="3 3" />
+              <line x1="50" y1="150" x2="380" y2="150" stroke="#E6EBE6" stroke-dasharray="3 3" />
+              <line x1="50" y1="190" x2="380" y2="190" stroke="#E6EBE6" />
+              
+              <!-- Eixo Y Labels -->
+              <text x="40" y="34" font-size="9" fill="#828D82" text-anchor="end">80%</text>
+              <text x="40" y="74" font-size="9" fill="#828D82" text-anchor="end">60%</text>
+              <text x="40" y="114" font-size="9" fill="#828D82" text-anchor="end">40%</text>
+              <text x="40" y="154" font-size="9" fill="#828D82" text-anchor="end">20%</text>
+              <text x="40" y="194" font-size="9" fill="#828D82" text-anchor="end">0%</text>
+              
+              <!-- Barras baseadas nos dados: Branca (72.3%), Parda (55.3%), Preta (56.1%), Indígena (29.9%) 
+                   Cálculo da altura da barra: valor * 2 (máximo 200px para 100%).
+                   y = 190 - (valor * 2)
+              -->
+              <!-- Branca (72.3% = 144.6px de altura, y = 45.4) -->
+              <rect class="bar-rect" x="75" y="45.4" width="40" height="144.6" rx="6" fill="#2F6B4F" data-value="72.3%" data-name="Branca" />
+              <!-- Parda (55.3% = 110.6px de altura, y = 79.4) -->
+              <rect class="bar-rect" x="155" y="79.4" width="40" height="110.6" rx="6" fill="#A8CBB1" data-value="55.3%" data-name="Parda" />
+              <!-- Preta (56.1% = 112.2px de altura, y = 77.8) -->
+              <rect class="bar-rect" x="235" y="77.8" width="40" height="112.2" rx="6" fill="#F28C28" data-value="56.1%" data-name="Preta" />
+              <!-- Indígena (29.9% = 59.8px de altura, y = 130.2) -->
+              <rect class="bar-rect" x="315" y="130.2" width="40" height="59.8" rx="6" fill="#C44A1C" data-value="29.9%" data-name="Indígena" />
+              
+              <!-- Eixo X Labels -->
+              <text x="95" y="210" font-size="10" font-weight="700" fill="#4B5F55" text-anchor="middle">Branca</text>
+              <text x="175" y="210" font-size="10" font-weight="700" fill="#4B5F55" text-anchor="middle">Parda</text>
+              <text x="255" y="210" font-size="10" font-weight="700" fill="#4B5F55" text-anchor="middle">Preta</text>
+              <text x="335" y="210" font-size="10" font-weight="700" fill="#4B5F55" text-anchor="middle">Indígena</text>
+            </svg>
+            
+            <!-- Tooltip flutuante simulado para as barras -->
+            <div id="tooltip-barras" class="chart-tooltip-sim"></div>
+          </div>
+          
+          <div class="chart-footer">
+            <a href="https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/39237-censo-2022-rede-de-esgoto-alcanca-62-5-da-populacao-mas-desigualdades-regionais-e-por-cor-e-raca-persistem" target="_blank" rel="noopener noreferrer" class="chart-source-link">
+              Fonte: IBGE Censo Demográfico 2022 🔗
+            </a>
+          </div>
+        </article>
+        
+        <!-- Gráfico 2: Ipea Habitações sem Banheiro -->
+        <article class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <span class="badge-esg">Dado Oficial</span>
+              <h3>Domicílios Sem Banheiros Exclusivos por Cor/Raça do Chefe (%)</h3>
+              <p>De mais de 1,2 milhão de famílias vivendo em moradias sem banheiros, a esmagadora maioria é chefiada por pessoas autodeclaradas pretas ou pardas.</p>
+            </div>
+            <span class="chart-icon-top">🍩</span>
+          </div>
+          
+          <div class="chart-body" style="flex-direction: column;">
+            <!-- SVG do Gráfico de Rosca/Donut -->
+            <svg class="svg-chart-container" viewBox="0 0 200 200" style="max-height: 180px;" aria-label="Gráfico de rosca mostrando domicílios sem banheiro">
+              <!-- Fundo do Donut -->
+              <circle cx="100" cy="100" r="70" fill="transparent" stroke="#F4F7F2" stroke-width="12" />
+              
+              <!-- Segmento 1: Negras (83.5% = dasharray de 367.2 sobre 439.8, offset -110 para alinhar no topo) -->
+              <circle class="donut-segment" cx="100" cy="100" r="70" fill="transparent" 
+                      stroke="#C44A1C" stroke-width="12" 
+                      stroke-dasharray="367.2 439.8" 
+                      stroke-dashoffset="110" 
+                      transform="rotate(-90 100 100)"
+                      data-value="83.5%" data-name="Chefes de Família Negros" />
+                      
+              <!-- Segmento 2: Não-Negras (16.5% = dasharray de 72.6 sobre 439.8, offset -110 - 367.2) -->
+              <circle class="donut-segment" cx="100" cy="100" r="70" fill="transparent" 
+                      stroke="#6B8F71" stroke-width="12" 
+                      stroke-dasharray="72.6 439.8" 
+                      stroke-dashoffset="-257.2" 
+                      transform="rotate(-90 100 100)"
+                      data-value="16.5%" data-name="Chefes Não-Negros" />
+                      
+              <!-- Texto Central -->
+              <text x="100" y="96" font-size="18" font-weight="900" fill="#123524" text-anchor="middle">83,5%</text>
+              <text x="100" y="112" font-size="8" font-weight="800" fill="#828D82" text-anchor="middle" text-transform="uppercase">Negros/Pardos</text>
+            </svg>
+            
+            <div class="chart-legend-grid">
+              <div class="legend-item">
+                <span class="legend-color-box" style="background-color: #C44A1C;"></span>
+                <span>Pessoas Negras: 83.5%</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color-box" style="background-color: #6B8F71;"></span>
+                <span>Pessoas Não-Negras: 16.5%</span>
+              </div>
+            </div>
+            
+            <div id="tooltip-rosca" class="chart-tooltip-sim"></div>
+          </div>
+          
+          <div class="chart-footer">
+            <a href="https://www.ipea.gov.br/portal/categories/45-todas-as-noticias/noticias/16114-brasil-tem-mais-de-1-2-milhao-de-familias-que-vivem-em-casas-sem-banheiro-83-5-delas-sao-chefiadas-por-pessoas-negras-e-70-por-mulheres" target="_blank" rel="noopener noreferrer" class="chart-source-link">
+              Fonte: Ipea (Dados Consolidados) 🔗
+            </a>
+          </div>
+        </article>
+
+        <!-- Gráfico 3: Relatos por Categoria (Diferente / Dinâmico do LocalStorage) -->
+        <article class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <span class="badge-esg" style="background-color: #FFF3E0; color: #C44A1C; border-color: #F6C56B;">Demonstração do Protótipo</span>
+              <h3>Volume de Ocorrências por Categoria de Queixa</h3>
+              <p>Contabilização dinâmica baseada nos relatos submetidos localmente. O gráfico é re-desenhado à medida que novos relatos são adicionados.</p>
+            </div>
+            <span class="chart-icon-top">📢</span>
+          </div>
+          
+          <div class="chart-body" id="categoria-chart-body">
+            <!-- Preenchido dinamicamente via JS -->
+            <div style="font-size: 13px; color: var(--text-secondary);">Carregando dados estatísticos...</div>
+          </div>
+          
+          <div class="chart-footer">
+            <span class="chart-source-link" style="cursor: default; pointer-events: none;">
+              Fonte: Banco EcoVoz (LocalStorage)
+            </span>
+          </div>
+        </article>
+
+        <!-- Gráfico 4: Status das Propostas Mitigadoras -->
+        <article class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <span class="badge-esg" style="background-color: #FFF3E0; color: #C44A1C; border-color: #F6C56B;">Demonstração do Protótipo</span>
+              <h3>Status de Andamento das Propostas ESG</h3>
+              <p>Indica a proporção de soluções sugeridas que se encontram em discussão corporativa inicial, em desenvolvimento prático ou totalmente concluídas.</p>
+            </div>
+            <span class="chart-icon-top">🚀</span>
+          </div>
+          
+          <div class="chart-body" id="status-chart-body" style="flex-direction: column;">
+            <!-- Preenchido dinamicamente via JS -->
+            <div style="font-size: 13px; color: var(--text-secondary);">Carregando dados estatísticos...</div>
+          </div>
+          
+          <div class="chart-footer">
+            <span class="chart-source-link" style="cursor: default; pointer-events: none;">
+              Fonte: Banco EcoVoz (LocalStorage)
+            </span>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Relatório Adicional: Classificação por Sentimento / Gravidade das queixas -->
+      <section class="sobre-pilares-card" style="margin-top: 24px; padding: 32px; border-radius: var(--radius-lg); text-align: left; background-color: #FFFFFF;">
+        <div style="display: flex; gap: 16px; align-items: start;">
+          <div style="font-size: 24px;">🛡️</div>
+          <div style="flex: 1;">
+            <h3 style="font-size: 20px; font-weight: 900; color: var(--green-dark);">Classificação por Nível de Severidade</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 6px; line-height: 1.6;">
+              O EcoVoz estrutura os relatos territoriais por gravidade avaliada pelos próprios moradores para subsidiar ações de ESG. A distribuição atual de relatos cadastrados é:
+            </p>
+            
+            <div id="gravidade-counters-grid" style="display: grid; grid-template-cols: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 20px;">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
+  <!-- Lógica de renderização de gráficos dinâmicos via JS puro e manipulação do DOM -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Define a identificação da sessão do usuário
+      renderSessionUser();
+
+      // 2. Registra listeners de hover nos gráficos estáticos do IBGE/Ipea
+      setupStaticChartTooltips();
+
+      // 3. Renderiza os gráficos dinâmicos baseados no localStorage
+      renderDynamicCharts();
+    });
+
+    /**
+     * Exibe o nome do usuário ativo ou modo demonstração
+     */
+    function renderSessionUser() {
+      const userBox = document.getElementById('dashboard-session-user');
+      if (!userBox) return;
+
+      const activeUser = window.AppDB ? window.AppDB.getActiveUser() : null;
+      if (activeUser) {
+        userBox.textContent = activeUser.name;
+      } else {
+        userBox.textContent = 'Modo Apresentação (Deslogado)';
+      }
+    }
+
+    /**
+     * Liga os tooltips simulados nas tags de barras e roscas do IBGE / Ipea
+     */
+    function setupStaticChartTooltips() {
+      const rects = document.querySelectorAll('.bar-rect');
+      const tooltipBar = document.getElementById('tooltip-barras');
+
+      rects.forEach(rect => {
+        rect.onmouseover = (e) => {
+          const name = rect.getAttribute('data-name');
+          const value = rect.getAttribute('data-value');
+          
+          tooltipBar.innerHTML = `<strong>${name}:</strong> ${value} de adequação`;
+          tooltipBar.style.display = 'block';
+        };
+
+        rect.onmousemove = (e) => {
+          const rectBounds = e.currentTarget.getBoundingClientRect();
+          const chartBody = e.currentTarget.closest('.chart-body').getBoundingClientRect();
+          
+          // Posiciona relativo ao container chart-body
+          const left = rectBounds.left - chartBody.left + (rectBounds.width / 2);
+          const top = rectBounds.top - chartBody.top;
+          
+          tooltipBar.style.left = left + 'px';
+          tooltipBar.style.top = top + 'px';
+        };
+
+        rect.onmouseout = () => {
+          tooltipBar.style.display = 'none';
+        };
+      });
+
+      // Roscas Ipea
+      const segments = document.querySelectorAll('.donut-segment');
+      const tooltipPie = document.getElementById('tooltip-rosca');
+
+      segments.forEach(seg => {
+        seg.onmouseover = (e) => {
+          const name = seg.getAttribute('data-name');
+          const value = seg.getAttribute('data-value');
+          
+          tooltipPie.innerHTML = `<strong>${name}:</strong> ${value}`;
+          tooltipPie.style.display = 'block';
+        };
+
+        seg.onmousemove = (e) => {
+          const chartBody = e.currentTarget.closest('.chart-body').getBoundingClientRect();
+          const x = e.clientX - chartBody.left;
+          const y = e.clientY - chartBody.top;
+          
+          tooltipPie.style.left = x + 'px';
+          tooltipPie.style.top = y + 'px';
+        };
+
+        seg.onmouseout = () => {
+          tooltipPie.style.display = 'none';
+        };
+      });
+    }
+
+    /**
+     * Busca dados do localStorage e renderiza os gráficos e contadores dinâmicos
+     */
+    function renderDynamicCharts() {
+      if (!window.AppDB) return;
+
+      const relatos = window.AppDB.getRelatos() || [];
+      const propostas = window.AppDB.getPropostas() || [];
+
+      // A. Contadores de Cabeçalho
+      const totalRelatos = relatos.length;
+      const totalCriticos = relatos.filter(r => r.gravidade === 'Crítica').length;
+      const totalPropostas = propostas.length;
+
+      document.getElementById('count-total-relatos').textContent = totalRelatos;
+      document.getElementById('count-criticos-relatos').textContent = totalCriticos;
+      document.getElementById('count-total-propostas').textContent = totalPropostas;
+
+      // B. Gráfico 3: Relatos por Categoria (Gráfico de Barras Horizontal Dinâmico)
+      renderCategoriaChart(relatos);
+
+      // C. Gráfico 4: Status das Propostas (Gráfico Donut Dinâmico)
+      renderStatusChart(propostas);
+
+      // D. Counters por Nível de Gravidade
+      renderGravidadeCounters(relatos);
+    }
+
+    /**
+     * Constrói e injeta o SVG dinâmico de categorias de queixas
+     */
+    function renderCategoriaChart(relatos) {
+      const container = document.getElementById('categoria-chart-body');
+      if (!container) return;
+
+      // Se não houver relatos, cria um fallback estético
+      let counts = {
+        'Ar': 0,
+        'Água': 0,
+        'Ruído': 0,
+        'Resíduos': 0,
+        'Mobilidade': 0,
+        'Verde urbano': 0
+      };
+
+      relatos.forEach(r => {
+        const cat = r.categoria || 'Outros';
+        counts[cat] = (counts[cat] || 0) + (r.numRelatos || 1);
+      });
+
+      const dataEntries = Object.entries(counts);
+      const maxVal = Math.max(...Object.values(counts), 1);
+
+      // Constrói SVG de barras horizontal
+      let svgHtml = `<svg class="svg-chart-container" viewBox="0 0 400 240" style="padding-left: 20px;">`;
+      
+      // Grid lines verticais
+      for(let i=1; i<=4; i++) {
+        let pct = i * 25;
+        let x = 80 + (i * 70); // eixo X mapeia de 80 a 360
+        svgHtml += `
+          <line x1="${x}" y1="10" x2="${x}" y2="210" stroke="#E6EBE6" stroke-dasharray="3 3" />
+          <text x="${x}" y="222" font-size="8" fill="#828D82" text-anchor="middle">${Math.round(maxVal * (pct/100))}</text>
+        `;
+      }
+      // Eixo Y vertical inicial
+      svgHtml += `<line x1="80" y1="10" x2="80" y2="210" stroke="#828D82" />`;
+
+      // Renderiza cada barra
+      dataEntries.forEach((entry, idx) => {
+        const name = entry[0];
+        const val = entry[1];
+        
+        // y coordenate: de 15 a 195 (espaçado de 34px)
+        const y = 20 + (idx * 32);
+        const barWidth = val > 0 ? (val / maxVal) * 260 : 2; // tamanho máx 260px
+        
+        svgHtml += `
+          <!-- Nome da categoria -->
+          <text x="72" y="${y + 14}" font-size="9" font-weight="700" fill="#4B5F55" text-anchor="end">${name}</text>
+          
+          <!-- Retângulo da barra -->
+          <rect class="bar-rect-din" x="80" y="${y}" width="${barWidth}" height="18" rx="4" fill="#F28C28" 
+                data-name="${name}" data-value="${val}" style="cursor: pointer; transition: width 0.5s ease;" />
+                
+          <!-- Valor no topo da barra -->
+          <text x="${85 + barWidth}" y="${y + 13}" font-size="9" font-weight="900" fill="#123524">${val}</text>
+        `;
+      });
+
+      svgHtml += `</svg>`;
+      container.innerHTML = svgHtml;
+
+      // Adiciona o tooltip para as barras dinâmicas
+      setupDynamicBarTooltips();
+    }
+
+    function setupDynamicBarTooltips() {
+      const rects = document.querySelectorAll('.bar-rect-din');
+      // Reutiliza o tooltip de barras criando se não existir
+      let tooltip = document.getElementById('tooltip-barras-din');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'tooltip-barras-din';
+        tooltip.className = 'chart-tooltip-sim';
+        document.body.appendChild(tooltip);
+      }
+
+      rects.forEach(rect => {
+        rect.onmouseover = (e) => {
+          const name = rect.getAttribute('data-name');
+          const value = rect.getAttribute('data-value');
+          tooltip.innerHTML = `<strong>${name}:</strong> ${value} relatos registrados`;
+          tooltip.style.display = 'block';
+        };
+
+        rect.onmousemove = (e) => {
+          tooltip.style.left = (e.pageX) + 'px';
+          tooltip.style.top = (e.pageY - 28) + 'px';
+        };
+
+        rect.onmouseout = () => {
+          tooltip.style.display = 'none';
+        };
+      });
+    }
+
+    /**
+     * Constrói e injeta o gráfico donut de propostas
+     */
+    function renderStatusChart(propostas) {
+      const container = document.getElementById('status-chart-body');
+      if (!container) return;
+
+      let counts = {
+        'Em Discussão': 0,
+        'Em Andamento': 0,
+        'Implementado': 0
+      };
+
+      propostas.forEach(p => {
+        const st = p.status || 'Em Discussão';
+        counts[st] = (counts[st] || 0) + 1;
+      });
+
+      const total = propostas.length || 1;
+      const pDisc = counts['Em Discussão'];
+      const pAnd = counts['Em Andamento'];
+      const pImp = counts['Implementado'];
+
+      // Porcentagens
+      const pctDisc = Math.round((pDisc / total) * 100);
+      const pctAnd = Math.round((pAnd / total) * 100);
+      const pctImp = Math.round((pImp / total) * 100);
+
+      // Circunferência de raio 70 = 2 * PI * 70 = 439.8
+      const circ = 439.8;
+      
+      const lenDisc = (pDisc / total) * circ;
+      const lenAnd = (pAnd / total) * circ;
+      const lenImp = (pImp / total) * circ;
+
+      // Offsets
+      const offsetDisc = 110; // 12 o'clock
+      const offsetAnd = offsetDisc - lenDisc;
+      const offsetImp = offsetAnd - lenAnd;
+
+      // Cores
+      const cDisc = '#F6C56B'; // Amber
+      const cAnd = '#6B8F71';  // Sage green
+      const cImp = '#2F6B4F';  // Deep green
+
+      let svgHtml = `
+        <svg class="svg-chart-container" viewBox="0 0 200 200" style="max-height: 180px;" aria-label="Gráfico de rosca mostrando propostas">
+          <circle cx="100" cy="100" r="70" fill="transparent" stroke="#F4F7F2" stroke-width="12" />
+      `;
+
+      if (propostas.length > 0) {
+        svgHtml += `
+          <!-- Em Discussão -->
+          <circle class="donut-segment-din" cx="100" cy="100" r="70" fill="transparent" 
+                  stroke="${cDisc}" stroke-width="12" 
+                  stroke-dasharray="${lenDisc} ${circ}" 
+                  stroke-dashoffset="${offsetDisc}" 
+                  transform="rotate(-90 100 100)"
+                  data-name="Em Discussão" data-value="${pDisc} (${pctDisc}%)" />
+                  
+          <!-- Em Andamento -->
+          <circle class="donut-segment-din" cx="100" cy="100" r="70" fill="transparent" 
+                  stroke="${cAnd}" stroke-width="12" 
+                  stroke-dasharray="${lenAnd} ${circ}" 
+                  stroke-dashoffset="${offsetAnd}" 
+                  transform="rotate(-90 100 100)"
+                  data-name="Em Andamento" data-value="${pAnd} (${pctAnd}%)" />
+                  
+          <!-- Implementado -->
+          <circle class="donut-segment-din" cx="100" cy="100" r="70" fill="transparent" 
+                  stroke="${cImp}" stroke-width="12" 
+                  stroke-dasharray="${lenImp} ${circ}" 
+                  stroke-dashoffset="${offsetImp}" 
+                  transform="rotate(-90 100 100)"
+                  data-name="Implementado" data-value="${pImp} (${pctImp}%)" />
+        `;
+      } else {
+        svgHtml += `
+          <circle cx="100" cy="100" r="70" fill="transparent" stroke="#E6EBE6" stroke-width="12" />
+        `;
+      }
+
+      svgHtml += `
+          <!-- Texto central com contagem total -->
+          <text x="100" y="96" font-size="18" font-weight="900" fill="#123524" text-anchor="middle">${propostas.length}</text>
+          <text x="100" y="112" font-size="7" font-weight="800" fill="#828D82" text-anchor="middle" text-transform="uppercase">Propostas ESG</text>
+        </svg>
+      `;
+
+      // Adiciona a legenda
+      let legendHtml = `
+        <div class="chart-legend-grid" style="margin-top: 16px;">
+          <div class="legend-item">
+            <span class="legend-color-box" style="background-color: ${cDisc};"></span>
+            <span>Em Discussão: ${pDisc} (${pctDisc}%)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color-box" style="background-color: ${cAnd};"></span>
+            <span>Em Andamento: ${pAnd} (${pctAnd}%)</span>
+          </div>
+          <div class="legend-item" style="grid-column: 1 / -1;">
+            <span class="legend-color-box" style="background-color: ${cImp};"></span>
+            <span>Implementado: ${pImp} (${pctImp}%)</span>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = svgHtml + legendHtml;
+
+      // Tooltips
+      setupDynamicDonutTooltips();
+    }
+
+    function setupDynamicDonutTooltips() {
+      const segments = document.querySelectorAll('.donut-segment-din');
+      let tooltip = document.getElementById('tooltip-rosca-din');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'tooltip-rosca-din';
+        tooltip.className = 'chart-tooltip-sim';
+        document.body.appendChild(tooltip);
+      }
+
+      segments.forEach(seg => {
+        seg.onmouseover = (e) => {
+          const name = seg.getAttribute('data-name');
+          const value = seg.getAttribute('data-value');
+          tooltip.innerHTML = `<strong>${name}:</strong> ${value}`;
+          tooltip.style.display = 'block';
+        };
+
+        seg.onmousemove = (e) => {
+          tooltip.style.left = (e.pageX) + 'px';
+          tooltip.style.top = (e.pageY - 28) + 'px';
+        };
+
+        seg.onmouseout = () => {
+          tooltip.style.display = 'none';
+        };
+      });
+    }
+
+    /**
+     * Renderiza os contadores por gravidade no rodapé
+     */
+    function renderGravidadeCounters(relatos) {
+      const grid = document.getElementById('gravidade-counters-grid');
+      if (!grid) return;
+
+      let counts = {
+        'Baixa': 0,
+        'Média': 0,
+        'Alta': 0,
+        'Crítica': 0
+      };
+
+      relatos.forEach(r => {
+        const grav = r.gravidade || 'Média';
+        counts[grav] = (counts[grav] || 0) + 1;
+      });
+
+      const total = relatos.length || 1;
+
+      grid.innerHTML = `
+        <div class="pilar-item" style="margin: 0; padding: 14px; border-left: 4px solid var(--green-medium);">
+          <span style="font-size: 10px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Baixa</span>
+          <strong style="display: block; font-size: 20px; color: var(--green-dark); margin-top: 4px;">${counts['Baixa']}</strong>
+          <span style="font-size: 9px; color: var(--text-secondary);">${Math.round(counts['Baixa']/total * 100)}% dos relatos</span>
+        </div>
+        
+        <div class="pilar-item" style="margin: 0; padding: 14px; border-left: 4px solid #eab308;">
+          <span style="font-size: 10px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Média</span>
+          <strong style="display: block; font-size: 20px; color: var(--green-dark); margin-top: 4px;">${counts['Média']}</strong>
+          <span style="font-size: 9px; color: var(--text-secondary);">${Math.round(counts['Média']/total * 100)}% dos relatos</span>
+        </div>
+        
+        <div class="pilar-item" style="margin: 0; padding: 14px; border-left: 4px solid var(--accent);">
+          <span style="font-size: 10px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Alta</span>
+          <strong style="display: block; font-size: 20px; color: var(--green-dark); margin-top: 4px;">${counts['Alta']}</strong>
+          <span style="font-size: 9px; color: var(--text-secondary);">${Math.round(counts['Alta']/total * 100)}% dos relatos</span>
+        </div>
+        
+        <div class="pilar-item" style="margin: 0; padding: 14px; border-left: 4px solid #C62828;">
+          <span style="font-size: 10px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">Crítica</span>
+          <strong style="display: block; font-size: 20px; color: var(--green-dark); margin-top: 4px;">${counts['Crítica']}</strong>
+          <span style="font-size: 9px; color: var(--text-secondary);">${Math.round(counts['Crítica']/total * 100)}% dos relatos</span>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

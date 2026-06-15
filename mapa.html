@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Impactos Socioambientais e Ocorrências | EcoVoz</title>
+  
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <script src="assets/db.js" defer></script>
+  <script src="assets/main.js" defer></script>
+  <script src="assets/accessibility.js" defer></script>
+</head>
+<body>
+
+  <!-- CABEÇALHO COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <header id="header-compartilhado"></header>
+
+  <main class="pt-compensate">
+    <div class="container-limite">
+      
+      <!-- Cabeçalho explicativo -->
+      <section class="text-left" style="margin-bottom: 24px;">
+        <span class="badge-esg">Cartografia Participativa</span>
+        <h2 style="font-size: 32px; font-weight: 900; color: var(--green-dark); margin-top: 8px;">
+          Mapa de Impactos Socioambientais (Brasil)
+        </h2>
+        <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 6px;">
+          Navegue pelas ocorrências georreferenciadas. Esta visualização demonstra como os relatos da comunidade são triados por prioridade e cruzados com dados industriais locais.
+        </p>
+      </section>
+
+      <!-- PAINEL DE FILTROS AVANÇADOS -->
+      <section class="metodologia-secao" style="padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-bottom: 24px; background-color: #FFFFFF;">
+        <div style="display: grid; grid-template-cols: repeat(12, 1fr); gap: 16px; align-items: flex-end; text-align: left;">
+          
+          <!-- Filtro UF -->
+          <div style="grid-column: span 2;" class="form-group">
+            <label for="filter-uf">Estado (UF)</label>
+            <select id="filter-uf">
+              <option value="Todos">Todos</option>
+              <option value="RJ">RJ</option>
+              <option value="SP">SP</option>
+              <option value="MG">MG</option>
+              <option value="BA">BA</option>
+              <option value="RS">RS</option>
+            </select>
+          </div>
+
+          <!-- Filtro Cidade -->
+          <div style="grid-column: span 3;" class="form-group">
+            <label for="filter-cidade">Cidade / Município</label>
+            <input type="text" id="filter-cidade" placeholder="Ex: Cubatão, Rio...">
+          </div>
+
+          <!-- Filtro Bairro -->
+          <div style="grid-column: span 3;" class="form-group">
+            <label for="filter-bairro">Bairro / Perímetro</label>
+            <input type="text" id="filter-bairro" placeholder="Ex: Vila Parisi, Jesuítas...">
+          </div>
+
+          <!-- Filtro Gravidade -->
+          <div style="grid-column: span 2;" class="form-group">
+            <label for="filter-gravidade">Gravidade</label>
+            <select id="filter-gravidade">
+              <option value="Todos">Todos os Níveis</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+              <option value="Crítica">Crítica</option>
+            </select>
+          </div>
+
+          <!-- Botão Limpar Filtros -->
+          <div style="grid-column: span 2;">
+            <button type="button" id="btn-clear-filters" class="btn-hero-mapa" style="width: 100%; justify-content: center; padding: 11px;">
+              Limpar Filtros
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Linha inferior de categorias e alternador de mapa de calor -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+          <!-- Filtros de Categorias por Botões Rápidos -->
+          <div class="menu-navegacao" id="category-filter-buttons" style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <button type="button" class="btn-tab-dores active" data-category="Todos">Todos</button>
+            <button type="button" class="btn-tab-dores inactive" data-category="Ar">Ar</button>
+            <button type="button" class="btn-tab-dores inactive" data-category="Água">Água</button>
+            <button type="button" class="btn-tab-dores inactive" data-category="Ruído">Ruído</button>
+            <button type="button" class="btn-tab-dores inactive" data-category="Resíduos">Resíduos</button>
+            <button type="button" class="btn-tab-dores inactive" data-category="Mobilidade">Mobilidade</button>
+            <button type="button" class="btn-tab-dores inactive" data-category="Verde urbano">Verde Urbano</button>
+          </div>
+
+          <!-- Alternador Mapa de Calor -->
+          <button type="button" id="btn-toggle-heatmap" class="btn-hero-mapa" style="border-color: #FFCDD2; color: #C62828;">
+            🔥 <span id="heatmap-text">Ativar Mapa de Calor</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- CANVAS PRINCIPAL DO MAPA E COLUNA LATERAL -->
+      <div class="map-layout-container">
+        
+        <!-- ==========================================
+             COLUNA ESQUERDA: SVG MAP CANVAS
+             ========================================== -->
+        <div class="svg-map-wrapper">
+          <!-- Identificação geoespacial superior esquerda -->
+          <div class="map-watermark">
+            <div class="badge-esg">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background-color: var(--green-medium); display: inline-block;"></span>
+              <span id="map-region-label">Mapeamento Nacional</span>
+            </div>
+          </div>
+
+          <!-- Coordenadas Geográficas sob o cursor (canto inferior esquerdo) -->
+          <div id="hover-gps-tracker" style="position: absolute; bottom: 44px; left: 16px; z-index: 10; font-family: var(--font-mono); font-size: 9px; color: var(--text-secondary); background-color: rgba(255,255,255,0.8); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); display: none;">
+            GPS Lat: <strong id="gps-lat">0.00</strong> | Lng: <strong id="gps-lng">0.00</strong>
+          </div>
+
+          <!-- Controles de Zoom -->
+          <div class="map-zoom-controls">
+            <button type="button" id="btn-map-zoom-in" title="Ampliar">+</button>
+            <button type="button" id="btn-map-zoom-out" title="Reduzir">-</button>
+          </div>
+
+          <!-- Área física do mapa -->
+          <div class="map-canvas-geo" id="map-geo-canvas-area">
+            
+            <!-- Grupo transformado pelo Zoom/Pan no JS -->
+            <div id="map-transform-group" style="width: 100%; height: 100%; transform-origin: center center; transition: transform 0.2s ease;">
+              
+              <svg id="brazil-svg-map" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <!-- Definições para os degradês do Mapa de Calor -->
+                <defs>
+                  <radialGradient id="heat-critical" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#ef4444" stop-opacity="0.85"></stop>
+                    <stop offset="40%" stop-color="#f97316" stop-opacity="0.5"></stop>
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0"></stop>
+                  </radialGradient>
+                  <radialGradient id="heat-high" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#f97316" stop-opacity="0.75"></stop>
+                    <stop offset="50%" stop-color="#eab308" stop-opacity="0.3"></stop>
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0"></stop>
+                  </radialGradient>
+                  <radialGradient id="heat-moderate" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#eab308" stop-opacity="0.6"></stop>
+                    <stop offset="60%" stop-color="#fef08a" stop-opacity="0.25"></stop>
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0"></stop>
+                  </radialGradient>
+                </defs>
+
+                <!-- Desenho esquemático das linhas e hidrografia -->
+                <path d="M 15,40 Q 25,5 50,5 T 85,25 Q 98,40 85,75 T 50,95 Q 25,95 15,75 Z" fill="none" stroke="#2d6a4f" stroke-width="0.3" stroke-dasharray="1,1" style="opacity: 0.25;"></path>
+                <path d="M 40,20 Q 55,10 70,25" fill="none" stroke="#1b4332" stroke-width="0.15" style="opacity: 0.15;"></path>
+                <path d="M 30,50 Q 50,65 75,50" fill="none" stroke="#1b4332" stroke-width="0.15" style="opacity: 0.15;"></path>
+                <path d="M -10,85 Q 35,45 80,85 T 120,60" fill="none" stroke="#2d6e9e" stroke-width="0.5" style="opacity: 0.12;"></path>
+
+                <text x="50" y="52" font-size="2" fill="var(--green-dark)" font-weight="900" style="opacity: 0.08; text-anchor: middle;">TERRITÓRIO NACIONAL</text>
+
+                <!-- Identificações Estaduais -->
+                <g style="font-size: 2px; font-weight: bold; opacity: 0.5; fill: var(--green-dark);">
+                  <text x="76" y="70">SP</text>
+                  <circle cx="75" cy="69" r="0.4"></circle>
+                  <text x="82" y="58">RJ</text>
+                  <circle cx="81" cy="57" r="0.4"></circle>
+                  <text x="63" y="47">MG</text>
+                  <circle cx="62" cy="46" r="0.4"></circle>
+                  <text x="74" y="32">BA</text>
+                  <circle cx="73" cy="31" r="0.4"></circle>
+                  <text x="44" y="85">RS</text>
+                  <circle cx="43" cy="84" r="0.4"></circle>
+                </g>
+
+                <!-- Grupo dinâmico para os degradês do Mapa de Calor -->
+                <g id="svg-heatmap-group" style="display: none;"></g>
+
+                <!-- Grupo dinâmico para os Marcadores dos Relatos -->
+                <g id="svg-markers-group"></g>
+              </svg>
+
+              <!-- Popup dinâmico de detalhes do ponto (posicionado dinamicamente em % no canvas) -->
+              <div class="map-popup-overlay" id="map-details-popup" style="display: none;"></div>
+
+            </div>
+
+          </div>
+
+          <!-- Legendas de Cores e Dica de Acessibilidade -->
+          <div class="map-bottom-legend-row">
+            <div class="legend-markers" id="map-legend-dots">
+              <div class="legend-item"><span class="legend-color-dot bg-grav-critica"></span> Crítica</div>
+              <div class="legend-item"><span class="legend-color-dot bg-grav-alta"></span> Alta</div>
+              <div class="legend-item"><span class="legend-color-dot bg-grav-media"></span> Média</div>
+              <div class="legend-item"><span class="legend-color-dot bg-grav-baixa"></span> Baixa</div>
+            </div>
+
+            <div class="heatmap-glow-bar" id="map-legend-heatmap" style="display: none;">
+              <span>Severidade acumulada:</span>
+              <div class="heatmap-gradient-indicator"></div>
+              <span>Crítica</span>
+            </div>
+
+            <div style="color: #0b3d59;">
+              ℹ️ Dica: Passe o mouse ou clique sobre qualquer ponto territorial!
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ==========================================
+             COLUNA DIREITA: SIDEBAR E DADOS REGIONAIS
+             ========================================== -->
+        <div class="map-sidebar">
+          
+          <!-- 1. Cartão de Risco Técnico Regional (Calculado via JS) -->
+          <div class="sidebar-risk-card">
+            <div class="risk-card-header">
+              <span>⚠️ Aferição de Risco Técnico Regional</span>
+            </div>
+            <div class="risk-card-issues-list">
+              <div>
+                <span style="font-size: 8px; font-weight: 800; text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 4px;">Riscos Identificados no Perímetro</span>
+                <ul class="risk-card-issues-list" id="risk-issues-ul">
+                  <!-- Injetado via JS -->
+                </ul>
+              </div>
+              
+              <div class="risk-stats-row">
+                <div class="risk-stat-item">
+                  <span>Instalações no escopo</span>
+                  <strong id="risk-txt-industries">0 complexos</strong>
+                </div>
+                <div class="risk-stat-item">
+                  <span>Risco de emissão</span>
+                  <strong id="risk-txt-level">Baixo</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Busca Inteligente de Indústrias (Simulado via JS) -->
+          <div class="sidebar-engine-card">
+            <div class="engine-card-header">
+              <h3>Busca Inteligente de Indústrias</h3>
+              <span>AI Model</span>
+            </div>
+            <p class="engine-card-intro">
+              Clique no botão para realizar uma varredura cruzada no banco de dados geográfico por siderúrgicas, aciarias e fábricas pesadas no perímetro atual.
+            </p>
+            <button type="button" id="btn-engine-trigger" class="btn-engine-search">
+              🔎 Realizar Busca Inteligente
+            </button>
+
+            <!-- Painel de Resultados de Fábricas Encontradas -->
+            <div class="engine-results-list" id="engine-results-container" style="display: none;">
+              <!-- Injetado via JS -->
+            </div>
+          </div>
+
+          <!-- 3. Indicadores de Opinião Comunitária (Seed Reviews) -->
+          <div class="sidebar-reviews-card">
+            <div class="reviews-card-header">
+              <h3>Opinião da Comunidade</h3>
+            </div>
+            <div class="reviews-metrics-list">
+              <!-- Métrica 1 -->
+              <div class="review-metric-item">
+                <span>Qualidade do Ar</span>
+                <div class="metric-bar-group">
+                  <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-review-ar" style="width: 0%;"></div></div>
+                  <strong id="txt-review-ar">0.0</strong>
+                </div>
+              </div>
+              <!-- Métrica 2 -->
+              <div class="review-metric-item">
+                <span>Conforto Acústico</span>
+                <div class="metric-bar-group">
+                  <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-review-som" style="width: 0%;"></div></div>
+                  <strong id="txt-review-som">0.0</strong>
+                </div>
+              </div>
+              <!-- Métrica 3 -->
+              <div class="review-metric-item">
+                <span>Qualidade de Vida Geral</span>
+                <div class="metric-bar-group">
+                  <div class="metric-bar-bg"><div class="metric-bar-fill" id="bar-review-vida" style="width: 0%;"></div></div>
+                  <strong id="txt-review-vida">0.0</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pequeno depoimento ilustrativo da área -->
+            <div class="reviews-depoimento-scroller" id="reviews-depoimento-container">
+              <!-- Injetado via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ COMPARTILHADO: Injetado dinamicamente pelo assets/main.js -->
+  <footer id="footer-compartilhado"></footer>
+
+  <!-- Lógica de Cartografia participativa, filtros e persistência local -->
+  <script>
+    // Parâmetros de Indústrias reais cadastradas na base
+    const dbIndustrias = [
+      { nome: 'Ternium Brasil', uf: 'RJ', cidade: 'Rio de Janeiro', bairro: 'Jesuítas (Santa Cruz)', atividade: 'Siderurgia integrada e Alto-forno siderúrgico.', risco: 'Alto' },
+      { nome: 'Gerdau Cosigua', uf: 'RJ', cidade: 'Rio de Janeiro', bairro: 'Santa Cruz', atividade: 'Laminação e trefilação de sucatas de ferro.', risco: 'Alto' },
+      { nome: 'Companhia Siderúrgica Nacional (CSN)', uf: 'RJ', cidade: 'Volta Redonda', bairro: 'Vila Santa Cecília / Conforto', atividade: 'Aciaria nacional de aço plano.', risco: 'Alto' },
+      { nome: 'Polo Petroquímico de Cubatão', uf: 'SP', cidade: 'Cubatão', bairro: 'Vila Parisi', atividade: 'Craqueamento e síntese química de fertilizantes.', risco: 'Alto' },
+      { nome: 'Usiminas S/A', uf: 'MG', cidade: 'Ipatinga', bairro: 'Centro / Veneza', atividade: 'Laminação integrada e coqueira de carvão.', risco: 'Alto' },
+      { nome: 'CGT Eletrosul Termelétrica', uf: 'RS', cidade: 'Candiota', bairro: 'Perímetro Urbano', atividade: 'Queima de carvão mineral de baixo teor calórico.', risco: 'Alto' },
+      { nome: 'Polo Químico Braskem', uf: 'BA', cidade: 'Camaçari', bairro: 'Distrito Industrial', atividade: 'Polímeros aromáticos e petroquímica primária.', risco: 'Alto' }
+    ];
+
+    // Dados de avaliação de moradores reais associados aos perímetros
+    const dbReviews = [
+      { uf: 'RJ', cidade: 'Rio de Janeiro', bairro: 'Jesuítas (Santa Cruz)', autor: 'Moradora, 67 anos', ar: 1, som: 3, vida: 2, dep: 'Limpo a varanda duas vezes por dia e o pano sai pretinho, brilhando de pó de ferro. As crianças sofrem com asma.' },
+      { uf: 'SP', cidade: 'Cubatão', bairro: 'Vila Parisi', autor: 'Morador, Vila Parisi', ar: 2, som: 1, vida: 1, dep: 'O ruído das purgas térmicas das chaminés de noite é terrível, parece um avião a jato atrás da parede da cozinha.' },
+      { uf: 'RJ', cidade: 'Volta Redonda', bairro: 'Vila Operária (Vila Santa Cecília)', autor: 'Moradora, Vila Operária', ar: 1, som: 2, vida: 2, dep: 'O pó preto de escória entra pelas frestas. As crianças brincam na pracinha e voltam com as roupas pretas de ferrugem.' },
+      { uf: 'MG', cidade: 'Ipatinga', bairro: 'Veneza', autor: 'Morador, Bairro Veneza', ar: 2, som: 3, vida: 3, dep: 'O calor perto dos fornos da aciaria é abafado. Sentimos falta das barreiras de árvores perimetrais.' },
+      { uf: 'BA', cidade: 'Camaçari', bairro: 'Distrito Industrial', autor: 'Moradora, Distrito Industrial', ar: 1, som: 4, vida: 2, dep: 'De madrugada o cheiro forte de enxofre entra em casa. As crianças acordam tossindo muito.' }
+    ];
+
+    // Parâmetros de Map Zoom
+    let mapZoomScale = 1.0;
+
+    // Filtros Ativos
+    let currentFilters = {
+      uf: 'Todos',
+      cidade: '',
+      bairro: '',
+      gravidade: 'Todos',
+      categoria: 'Todos'
+    };
+
+    let heatmapActive = false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Carrega relatos do localStorage e monta o mapa
+      renderMapData();
+
+      // Assina escutadores dos filtros principais
+      document.getElementById('filter-uf').addEventListener('change', (e) => {
+        currentFilters.uf = e.target.value;
+        renderMapData();
+      });
+      document.getElementById('filter-cidade').addEventListener('input', (e) => {
+        currentFilters.cidade = e.target.value.trim();
+        renderMapData();
+      });
+      document.getElementById('filter-bairro').addEventListener('input', (e) => {
+        currentFilters.bairro = e.target.value.trim();
+        renderMapData();
+      });
+      document.getElementById('filter-gravidade').addEventListener('change', (e) => {
+        currentFilters.gravidade = e.target.value;
+        renderMapData();
+      });
+
+      // Botoes de categoria
+      const catBtns = document.querySelectorAll('#category-filter-buttons button');
+      catBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          catBtns.forEach(b => { b.className = 'btn-tab-dores inactive'; });
+          btn.className = 'btn-tab-dores active';
+          currentFilters.categoria = btn.getAttribute('data-category');
+          renderMapData();
+        });
+      });
+
+      // Limpar filtros
+      document.getElementById('btn-clear-filters').onclick = () => {
+        document.getElementById('filter-uf').value = 'Todos';
+        document.getElementById('filter-cidade').value = '';
+        document.getElementById('filter-bairro').value = '';
+        document.getElementById('filter-gravidade').value = 'Todos';
+        
+        catBtns.forEach(b => { b.className = 'btn-tab-dores inactive'; });
+        document.querySelector('[data-category="Todos"]').className = 'btn-tab-dores active';
+
+        currentFilters = { uf: 'Todos', cidade: '', bairro: '', gravidade: 'Todos', categoria: 'Todos' };
+        renderMapData();
+      };
+
+      // Zoom do mapa
+      document.getElementById('btn-map-zoom-in').onclick = () => {
+        mapZoomScale = Math.min(2.5, mapZoomScale + 0.25);
+        applyMapZoom();
+      };
+      document.getElementById('btn-map-zoom-out').onclick = () => {
+        mapZoomScale = Math.max(0.75, mapZoomScale - 0.25);
+        applyMapZoom();
+      };
+
+      // Alternador de calor
+      document.getElementById('btn-toggle-heatmap').onclick = toggleHeatmapMode;
+
+      // Busca por IA
+      document.getElementById('btn-engine-trigger').onclick = handleAdvancedEngineSearch;
+
+      // GPS Hover tracker no SVG
+      const svgMap = document.getElementById('brazil-svg-map');
+      const gpsTracker = document.getElementById('hover-gps-tracker');
+      const latVal = document.getElementById('gps-lat');
+      const lngVal = document.getElementById('gps-lng');
+
+      svgMap.addEventListener('mousemove', (e) => {
+        const rect = svgMap.getBoundingClientRect();
+        const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+        const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        const lat = (-15.7938 - (yPct - 50) * 0.15).toFixed(4);
+        const lng = (-47.8827 + (xPct - 50) * 0.12).toFixed(4);
+        
+        latVal.textContent = lat;
+        lngVal.textContent = lng;
+        gpsTracker.style.display = 'block';
+      });
+
+      svgMap.addEventListener('mouseleave', () => {
+        gpsTracker.style.display = 'none';
+      });
+    });
+
+    /**
+     * Aplica o zoom e translação no container
+     */
+    function applyMapZoom() {
+      const group = document.getElementById('map-transform-group');
+      if (group) {
+        group.style.transform = `scale(${mapZoomScale})`;
+      }
+    }
+
+    /**
+     * Alterna o modo mapa de calor
+     */
+    function toggleHeatmapMode() {
+      heatmapActive = !heatmapActive;
+      const btn = document.getElementById('btn-toggle-heatmap');
+      const text = document.getElementById('heatmap-text');
+      
+      const dotsLegend = document.getElementById('map-legend-dots');
+      const heatLegend = document.getElementById('map-legend-heatmap');
+      const heatGroup = document.getElementById('svg-heatmap-group');
+
+      if (heatmapActive) {
+        btn.style.backgroundColor = '#C62828';
+        btn.style.color = '#FFFFFF';
+        btn.style.borderColor = '#C62828';
+        text.textContent = 'Desativar Mapa de Calor';
+        
+        dotsLegend.style.display = 'none';
+        heatLegend.style.display = 'flex';
+        heatGroup.style.display = 'block';
+      } else {
+        btn.style.backgroundColor = '#FFFFFF';
+        btn.style.color = '#C62828';
+        btn.style.borderColor = '#FFCDD2';
+        text.textContent = 'Ativar Mapa de Calor';
+        
+        dotsLegend.style.display = 'flex';
+        heatLegend.style.display = 'none';
+        heatGroup.style.display = 'none';
+      }
+    }
+
+    /**
+     * Varre e renderiza os marcadores geoespaciais conforme os filtros ativos
+     */
+    function renderMapData() {
+      // Oculta popup anterior
+      closeMarkerPopup();
+
+      // Carrega relatos do localStorage via AppDB
+      const relatos = window.AppDB ? window.AppDB.getRelatos() : [];
+
+      // Filtra de acordo com currentFilters
+      const filtrados = relatos.filter(r => {
+        const matchesUf = currentFilters.uf === 'Todos' || r.uf === currentFilters.uf;
+        
+        const matchesCidade = !currentFilters.cidade || 
+          (r.cidade && r.cidade.toLowerCase().includes(currentFilters.cidade.toLowerCase()));
+        
+        const matchesBairro = !currentFilters.bairro || 
+          r.bairro.toLowerCase().includes(currentFilters.bairro.toLowerCase());
+
+        const matchesGravidade = currentFilters.gravidade === 'Todos' || r.gravidade === currentFilters.gravidade;
+        
+        const matchesCategoria = currentFilters.categoria === 'Todos' || r.categoria === currentFilters.categoria;
+
+        return matchesUf && matchesCidade && matchesBairro && matchesGravidade && matchesCategoria;
+      });
+
+      // 1. Atualiza o título do escopo da região
+      const regionLabel = document.getElementById('map-region-label');
+      if (currentFilters.uf === 'Todos') {
+        regionLabel.textContent = 'Mapeamento Nacional';
+      } else {
+        regionLabel.textContent = `Região Foco: UF ${currentFilters.uf}`;
+      }
+
+      // 2. Renderiza Marcadores SVG e Mapa de Calor
+      const markersGroup = document.getElementById('svg-markers-group');
+      const heatGroup = document.getElementById('svg-heatmap-group');
+      
+      let markersHTML = '';
+      let heatHTML = '';
+
+      filtrados.forEach(r => {
+        const x = r.coordenadas ? r.coordenadas.x : 50;
+        const y = r.coordenadas ? r.coordenadas.y : 50;
+        
+        let color = '#1b4332'; // Baixa
+        let glowClass = 'bg-grav-baixa';
+        let heatGradId = 'heat-moderate';
+
+        if (r.gravidade === 'Crítica') {
+          color = '#e11d48';
+          glowClass = 'bg-grav-critica';
+          heatGradId = 'heat-critical';
+        } else if (r.gravidade === 'Alta') {
+          color = '#f28c28';
+          glowClass = 'bg-grav-alta';
+          heatGradId = 'heat-high';
+        } else if (r.gravidade === 'Média') {
+          color = '#eab308';
+          glowClass = 'bg-grav-media';
+          heatGradId = 'heat-moderate';
+        }
+
+        // Adiciona ponto ao grupo de marcadores
+        markersHTML += `
+          <g class="cursor-pointer" onclick="openMarkerPopup('${r.id}', ${x}, ${y})">
+            <!-- Halo externo de hover/seleção -->
+            <circle cx="${x}" cy="${y}" r="2.8" fill="${color}" opacity="0.15"></circle>
+            <!-- Centro preenchido -->
+            <circle cx="${x}" cy="${y}" r="1.4" fill="${color}" stroke="#FFFFFF" stroke-width="0.18"></circle>
+          </g>
+        `;
+
+        // Adiciona mancha ao mapa de calor
+        let rad = r.gravidade === 'Crítica' ? 12 : r.gravidade === 'Alta' ? 9 : 6;
+        heatHTML += `
+          <circle cx="${x}" cy="${y}" r="${rad}" fill="url(#${heatGradId})" opacity="0.65" style="mix-blend-mode: multiply;"></circle>
+        `;
+      });
+
+      markersGroup.innerHTML = markersHTML;
+      heatGroup.innerHTML = heatHTML;
+
+      // 3. Atualiza os cards estatísticos da barra lateral
+      updateSidebarStats(filtrados);
+    }
+
+    /**
+     * Atualiza as estatísticas e as tabelas de risco da barra lateral
+     */
+    function updateSidebarStats(relatosFiltrados) {
+      // A. Aferição de Risco Técnico
+      const activeUf = currentFilters.uf;
+      const activeCity = currentFilters.cidade;
+
+      const indFiltradas = dbIndustrias.filter(ind => {
+        const matchesUf = activeUf === 'Todos' || ind.uf === activeUf;
+        const matchesCity = !activeCity || ind.cidade.toLowerCase().includes(activeCity.toLowerCase());
+        return matchesUf && matchesCity;
+      });
+
+      const countInd = indFiltradas.length;
+      document.getElementById('risk-txt-industries').textContent = `${countInd} complexo(s)`;
+
+      const riskLvl = document.getElementById('risk-txt-level');
+      const listUl = document.getElementById('risk-issues-ul');
+      let issuesHTML = '';
+
+      if (countInd > 0) {
+        riskLvl.textContent = 'Crítico / Elevado';
+        riskLvl.style.color = '#C62828';
+        issuesHTML = `
+          <li class="risk-issue-item">Plumas de dispersão metálica de coque e ferro sedimentável sedimentando nos quintais.</li>
+          <li class="risk-issue-item">Poluição acústica decorrente de sopradores industriais operando em madrugadas.</li>
+        `;
+      } else {
+        riskLvl.textContent = 'Sob Controle';
+        riskLvl.style.color = 'var(--green-medium)';
+        issuesHTML = `
+          <li class="risk-issue-item">Concentração regulatória dentro dos marcos normativos vigentes do CONAMA.</li>
+        `;
+      }
+      listUl.innerHTML = issuesHTML;
+
+      // B. Opinião Comunitária (Seed Reviews)
+      const reviewsFiltradas = dbReviews.filter(rev => {
+        const matchesUf = activeUf === 'Todos' || rev.uf === activeUf;
+        const matchesCity = !activeCity || rev.cidade.toLowerCase().includes(activeCity.toLowerCase());
+        return matchesUf && matchesCity;
+      });
+
+      const arBar = document.getElementById('bar-review-ar');
+      const arTxt = document.getElementById('txt-review-ar');
+      const somBar = document.getElementById('bar-review-som');
+      const somTxt = document.getElementById('txt-review-som');
+      const vidaBar = document.getElementById('bar-review-vida');
+      const vidaTxt = document.getElementById('txt-review-vida');
+      const depContainer = document.getElementById('reviews-depoimento-container');
+
+      if (reviewsFiltradas.length > 0) {
+        const count = reviewsFiltradas.length;
+        const arSum = reviewsFiltradas.reduce((sum, item) => sum + item.ar, 0);
+        const somSum = reviewsFiltradas.reduce((sum, item) => sum + item.som, 0);
+        const vidaSum = reviewsFiltradas.reduce((sum, item) => sum + item.vida, 0);
+
+        const avgAr = (arSum / count).toFixed(1);
+        const avgSom = (somSum / count).toFixed(1);
+        const avgVida = (vidaSum / count).toFixed(1);
+
+        arTxt.textContent = avgAr;
+        arBar.style.width = `${(avgAr / 5) * 100}%`;
+        somTxt.textContent = avgSom;
+        somBar.style.width = `${(avgSom / 5) * 100}%`;
+        vidaTxt.textContent = avgVida;
+        vidaBar.style.width = `${(avgVida / 5) * 100}%`;
+
+        // Renderiza o depoimento do primeiro do escopo filtrado
+        const firstDep = reviewsFiltradas[0];
+        depContainer.innerHTML = `
+          <div class="depoimento-scroller-item animate-fade-in">
+            <p class="text">"${firstDep.dep}"</p>
+            <p class="author">&mdash; ${firstDep.autor} (${firstDep.bairro})</p>
+          </div>
+        `;
+      } else {
+        // Fallback
+        arTxt.textContent = '4.2';
+        arBar.style.width = '84%';
+        somTxt.textContent = '4.0';
+        somBar.style.width = '80%';
+        vidaTxt.textContent = '4.5';
+        vidaBar.style.width = '90%';
+        depContainer.innerHTML = `
+          <div class="depoimento-scroller-item">
+            <p class="text">Não há queixas críticas registradas para a região selecionada.</p>
+          </div>
+        `;
+      }
+    }
+
+    /**
+     * Abre o popup de detalhes de um marcador
+     */
+    function openMarkerPopup(id, x, y) {
+      const relatos = window.AppDB ? window.AppDB.getRelatos() : [];
+      const relato = relatos.find(r => r.id === id);
+      if (!relato) return;
+
+      const popup = document.getElementById('map-details-popup');
+      popup.style.display = 'block';
+      popup.style.left = `${x}%`;
+      popup.style.top = `${y}%`;
+
+      let gravStyle = 'bg-grav-baixa';
+      if (relato.gravidade === 'Crítica') gravStyle = 'bg-grav-critica';
+      else if (relato.gravidade === 'Alta') gravStyle = 'bg-grav-alta';
+      else if (relato.gravidade === 'Média') gravStyle = 'bg-grav-media';
+
+      popup.innerHTML = `
+        <div class="map-popup-header">
+          <span class="cat">${relato.categoria}</span>
+          <span class="grav ${gravStyle}" style="color: #FFFFFF;">${relato.gravidade}</span>
+          <button type="button" onclick="closeMarkerPopup()" class="map-popup-close">&times;</button>
+        </div>
+        <div class="map-popup-body">
+          <h4>${relato.bairro}</h4>
+          <p class="loc">${relato.cidade} - ${relato.uf}</p>
+          <p class="desc">"${relato.descricao}"</p>
+        </div>
+      `;
+    }
+
+    /**
+     * Fecha o popup de detalhes
+     */
+    function closeMarkerPopup() {
+      const popup = document.getElementById('map-details-popup');
+      if (popup) {
+        popup.style.display = 'none';
+      }
+    }
+
+    // Vincula a função de fechar ao escopo global para o botão fechar do popup
+    window.closeMarkerPopup = closeMarkerPopup;
+    window.openMarkerPopup = openMarkerPopup;
+
+    /**
+     * Simula busca por IA na barra lateral
+     */
+    function handleAdvancedEngineSearch() {
+      const triggerBtn = document.getElementById('btn-engine-trigger');
+      const container = document.getElementById('engine-results-container');
+      
+      triggerBtn.disabled = true;
+      triggerBtn.innerHTML = '⏳ Varrendo base geográfica...';
+
+      setTimeout(() => {
+        triggerBtn.disabled = false;
+        triggerBtn.innerHTML = '🔎 Realizar Busca Inteligente';
+        container.style.display = 'flex';
+
+        // Filtra indústrias baseadas no filtro de UF ativo
+        const activeUf = currentFilters.uf;
+        const filtradas = dbIndustrias.filter(ind => activeUf === 'Todos' || ind.uf === activeUf);
+
+        if (filtradas.length > 0) {
+          container.innerHTML = filtradas.map(ind => `
+            <div class="engine-result-item animate-fade-in">
+              <h5>${ind.nome}</h5>
+              <p class="act">${ind.atividade}</p>
+              <div class="meta">
+                <span>UF: ${ind.uf} | Cidade: ${ind.cidade}</span>
+                <span style="color: #C62828;">Risco: ${ind.risco}</span>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = `
+            <div style="font-size: 11px; text-align: center; color: var(--text-secondary); padding: 12px;">
+              Nenhum complexo pesado cadastrado nesta UF.
+            </div>
+          `;
+        }
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>
